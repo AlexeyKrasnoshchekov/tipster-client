@@ -74,6 +74,29 @@ input[type='checkbox'] { display: none; }
   flex-direction: column;
 }
 
+.wrapper-up {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.wrapper-actions {
+  box-sizing: border-box;
+  display: flex;
+  width: 50%;
+  padding: 0 10%;
+  /* justify-content: space-between; */
+  flex-direction: column;
+  align-items: center;
+}
+
+.buttons {
+  display: flex;
+  margin-bottom: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
 .sourcesAggs {
   display: flex;
   justify-content: flex-start;
@@ -109,4 +132,42 @@ input[type='checkbox'] { display: none; }
 .width10 {
   width: 10%;
   text-align: center;
+}
+
+/* Buttons styles start */
+.button {
+  display: inline-block;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  min-width: 6rem;
+  text-decoration: none;
+  background: #0069ed;
+  color: #ffffff;
+  font-family: sans-serif;
+  font-size: 0.75rem;
+  line-height: 1;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out, transform 150ms ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.button:hover {
+  background: #0053ba;
+}
+
+/* .button:focus {
+  background: #0053ba;
+  outline: 1px solid #fff;
+  outline-offset: -4px;
+} */
+
+/* Button styles end */
+.active {
+  background-color: red;
+  font-family: sans-serif;
+  font-size: 0.75rem;
 }
