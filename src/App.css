@@ -15,6 +15,25 @@ ul {
   background: linear-gradient(to bottom,  #f2f5f6 0%,#e3eaed 37%,#c8d7dc 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
+.counter {
+  display: flex;
+  width: 100%;
+  outline: 1px solid red;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.counter_title {
+  width: 15%;
+}
+.counter_matchesList {
+  width: 15%;
+}
+.counter_prev {
+  width: 10%;
+}
+.counter_today {
+  width: 10%;
+}
 input[type='checkbox'] { display: none; } 
 .wrap-collabsible { margin: 1.2rem 0; } 
 .lbl-toggle { 

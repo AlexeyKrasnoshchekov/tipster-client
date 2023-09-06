@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
-import { getBttsMongo } from './api/getBttsMongo';
 import { context } from './context/context';
 import './App.css';
-import { getResultsTotalMongo } from './api/getResultsTotalMongo';
-import { getResultsMongo } from './api/getResultsMongo';
+// import { getResultsMongo } from './api/getResultsMongo';
 import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import React from 'react';
@@ -15,19 +13,43 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import { deleteResultsTotalMongo } from './api/deleteResultsTotalMongo';
 import { getClubStat } from './api/getClubStat';
-// import { saveStatMongo } from './api/saveStatMongo';
-// import { saveTodayBetMongo } from './api/saveTodayBet';
-import { saveBttsMongo } from './api/saveBttsMongo';
-import { getWinDataMongo } from './api/getWinDataMongo';
-// import { getTodayBetArrMongo } from './api/getTodayBetArrMongo';
-// import { getAccasMongo } from './api/getAccasMongo';
-import { getUnder25Mongo } from './api/getUnder25';
-// import { saveAccaMongo } from './api/saveAccaMongo';
-import { saveUnderMongo } from './api/saveUnderMongo';
-import { saveWinMongo } from './api/saveWinMongo';
+
+import { deleteBtts, getBtts, loadBtts, saveBtts } from './api/btts';
+import { deleteUnder, getUnder, loadUnder, saveUnder } from './api/under';
+import { deleteWin, getWinData, loadWin, saveWinData } from './api/win';
+import {
+  deleteResult,
+  getResult,
+  getResultTotal,
+  getZeroCounter,
+  loadResult,
+  saveResultTotal,
+  saveZeroCounter,
+} from './api/result';
+import { deleteOverData, loadCrawlData, loadOverData } from './api/over';
+import { sortData } from './utils';
+import Counter from './components/counter';
 
 function App() {
-  const { setBtts, setResultsTotal } = useContext(context);
+  const today = new Date();
+  const yesterday = new Date(today);
+
+  yesterday.setDate(yesterday.getDate() - 1);
+  const formattedYesterday = format(yesterday, 'dd.MM.yyyy');
+  const yesterdayString = formattedYesterday.toString();
+
+  const {
+    setResultsTotal,
+    zeroCounter,
+    zeroCounterYesterday,
+    increment,
+    pushMatches,
+    setCounterFromMongo,
+    setCounterFromMongoYesterday,
+  } = useContext(context);
+
+  console.log('zeroCounterYesterday', zeroCounterYesterday);
+
   const [bttsLocal, setBttsLocal] = useState([]);
   const [allRes, setAllRes] = useState([]);
   // const [bttsWLLocal, setBttsWLLocal] = useState([]);
@@ -39,8 +61,6 @@ function App() {
   // const [todayBet, setTodayBet] = useState(null);
   const [resultsTotalLocal, setResultsTotalLocal] = useState([]);
   const [resultsTotalLocalFil, setResultsTotalLocalFil] = useState([]);
-  // const [resHomeTeamsArr, setResHomeTeamsArr] = useState([]);
-  const [todayBetPredsArr, setTodayBetPredsArr] = useState([]);
   const [todayDate, setDate] = useState('');
   const [showZero, setShowZero] = useState(false);
   const [addWin, setAddWinToBtts] = useState(false);
@@ -64,9 +84,40 @@ function App() {
   const [resultDataExist, setResultDataExist] = useState(false);
   const [totalDataExist, setTotalDataExist] = useState(false);
   const [underDataExist, setUnderDataExist] = useState(false);
-  // const [today, setToday] = useState('');
-  // const [todayBetLocal, setTodayBetLocal] = useState(null);
-  // const [todayBetArrLocal, setTodayBetArrLocal] = useState([]);
+
+  //zero counter match inputs state
+  const [matchesO25Tip, setMatchesO25Tip] = useState('');
+  const [matchesBettingtips_o25, setMatchesBettingtips_o25] = useState('');
+  const [matchesWincomparator_o25, setMatchesWincomparator_o25] = useState('');
+  const [matchesAccum_btts, setMatchesAccum_btts] = useState('');
+  const [matchesFst_btts, setMatchesFst_btts] = useState('');
+  const [matchesR2bet_o25, setMatchesR2bet_o25] = useState('');
+  const [matchesHello_o25, setMatchesHello_o25] = useState('');
+  const [matchesFbp_o25, setMatchesFbp_o25] = useState('');
+  const [matchesFst_o25, setMatchesFst_o25] = useState('');
+  const [matchesFootsuper_o25, setMatchesFootsuper_o25] = useState('');
+  const [matchesFootsuper_btts, setMatchesFootsuper_btts] = useState('');
+  const [matchesBettingtips_btts, setMatchesBettingtips_btts] = useState('');
+  const [matchesProt_o25, setMatchesProt_o25] = useState('');
+  const [matchesR2bet_btts, setMatchesR2bet_btts] = useState('');
+  const [matchesGoalnow_o25, setMatchesGoalnow_o25] = useState('');
+  const [matchesAccum_o25, setMatchesAccum_o25] = useState('');
+  const [matchesWincomparator_btts, setMatchesWincomparator_btts] =
+    useState('');
+  const [matchesWincomparator_win, setMatchesWincomparator_win] = useState('');
+  const [matchesMybets_win, setMatchesMybets_win] = useState('');
+  const [matchesVenasbet_win, setMatchesVenasbet_win] = useState('');
+  const [matchesProt_win, setMatchesProt_win] = useState('');
+  const [matchesFooty_win, setMatchesFooty_win] = useState('');
+  const [matchesBetgenuine_win, setMatchesBetgenuine_win] = useState('');
+  const [matchesVitibet_win, setMatchesVitibet_win] = useState('');
+  const [matchesR2bet_win, setMatchesR2bet_win] = useState('');
+  const [matchesMines_win, setMatchesMines_win] = useState('');
+  const [matchesPassion_win, setMatchesPassion_win] = useState('');
+  const [matchesFbp_win, setMatchesFbp_win] = useState('');
+  const [matchesFootsuper_win, setMatchesFootsuper_win] = useState('');
+  const [matchesHello_win, setMatchesHello_win] = useState('');
+  const [matchesBettingtips_win, setMatchesBettingtips_win] = useState('');
 
   const [isNoFilVisible, setIsNoFilVisible] = useState(false);
   const [predType, setPredType] = useState('btts');
@@ -74,6 +125,7 @@ function App() {
 
   // const [predTypeAcca, setPredTypeAcca] = useState('btts');
   const [homeTeamTotalPred, setHomeTeamTotalPred] = useState('');
+
   // const [homeTeamAccaPred, setHomeTeamAccaPred] = useState('');
   const [homeTeamWinPred, setHomeTeamWinPred] = useState('');
   const [predTeamWinPred, setPredTeamWinPred] = useState('');
@@ -98,88 +150,83 @@ function App() {
     console.log('toggleAddWin');
     setAddWinToBtts((current) => !current);
   }
+
   async function handleLoadBtts() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/btts/save`);
-    const text = await res.text();
-    text === 'btts loaded' && setBttsDataExist(true);
-    setLoader(false);
-  }
-  async function handleLoadUnder() {
-    setLoader(true);
-    const res = await fetch(`http://localhost:8000/under/save`);
-    const text = await res.text();
-    text === 'under loaded' && setUnderDataExist(true);
-    setLoader(false);
-  }
-  async function handleLoadTotal() {
-    setTotalLoader(true);
-    const res = await fetch(`http://localhost:8000/total/save`);
-    const text = await res.text();
-    text === 'total loaded' && setTotalDataExist(true);
-    setTotalLoader(false);
-  }
-  async function handleLoadOver() {
-    setLoader(true);
-    const res = await fetch(`http://localhost:8000/over/save`);
-    const text = await res.text();
-    text === 'over loaded' && setOverDataExist(true);
-    setLoader(false);
-  }
-  async function handleLoadCrawl() {
-    setLoader(true);
-    const res = await fetch(`http://localhost:8000/crawl/save`);
-    const text = await res.text();
-    text === 'crawl loaded' && setCrawlDataExist(true);
+    const res = await loadBtts();
+    res === 'btts loaded' && setBttsDataExist(true);
     setLoader(false);
   }
   async function handleDeleteBtts() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/btts/delete`);
-    const text = await res.text();
-    text === 'btts deleted' && setBttsDataExist(false);
+    const res = await deleteBtts();
+    res === 'btts deleted' && setBttsDataExist(false);
     setLoader(false);
   }
-  async function handleDeleteOver() {
+
+  async function handleLoadUnder() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/over/delete`);
-    const text = await res.text();
-    text === 'over deleted' && setOverDataExist(false);
+    const res = await loadUnder();
+    res === 'under loaded' && setUnderDataExist(true);
     setLoader(false);
   }
   async function handleDeleteUnder() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/under/delete`);
-    const text = await res.text();
-    text === 'under deleted' && setUnderDataExist(false);
+    const res = await deleteUnder();
+    res === 'under deleted' && setUnderDataExist(false);
     setLoader(false);
   }
+
+  async function handleLoadTotal() {
+    setTotalLoader(true);
+    const res = await saveResultTotal();
+    res === 'total loaded' && setTotalDataExist(true);
+    setTotalLoader(false);
+  }
+
+  async function handleLoadOver() {
+    setLoader(true);
+    const res = await loadOverData();
+    res === 'over loaded' && setOverDataExist(true);
+    setLoader(false);
+  }
+  async function handleDeleteOver() {
+    setLoader(true);
+    const res = await deleteOverData();
+    res === 'over deleted' && setOverDataExist(false);
+    setLoader(false);
+  }
+
+  async function handleLoadCrawl() {
+    setLoader(true);
+    const res = await loadCrawlData();
+    res === 'crawl loaded' && setCrawlDataExist(true);
+    setLoader(false);
+  }
+
   async function handleLoadWin() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/win/save`);
-    const text = await res.text();
-    text === 'win loaded' && setWinDataExist(true);
+    const res = await loadWin();
+    res === 'win loaded' && setWinDataExist(true);
     setLoader(false);
   }
   async function handleDeleteWin() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/win/delete`);
-    const text = await res.text();
-    text === 'win deleted' && setWinDataExist(false);
+    const res = await deleteWin();
+    res === 'win deleted' && setWinDataExist(false);
     setLoader(false);
   }
+
   async function handleLoadResult() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/result/save`);
-    const text = await res.text();
-    text === 'result loaded' && setResultDataExist(true);
+    const res = await loadResult();
+    res === 'result loaded' && setResultDataExist(true);
     setLoader(false);
   }
   async function handleDeleteResult() {
     setLoader(true);
-    const res = await fetch(`http://localhost:8000/result/delete`);
-    const text = await res.text();
-    text === 'result deleted' && setResultDataExist(false);
+    const res = await deleteResult();
+    res === 'result deleted' && setResultDataExist(false);
     setLoader(false);
   }
   // async function handleGetBtts() {
@@ -193,7 +240,7 @@ function App() {
 
   useEffect(() => {
     async function fetchData() {
-      const bttsDataMongo = await getBttsMongo(todayDate);
+      const bttsDataMongo = await getBtts(todayDate);
       console.log('bttsDataMongo', bttsDataMongo);
       bttsDataMongo.length !== 0 &&
         bttsDataMongo.some((elem) => elem.action === 'btts') &&
@@ -202,10 +249,25 @@ function App() {
         bttsDataMongo.some((elem) => elem.action === 'over25') &&
         setOverDataExist(true);
 
-      const winDataMongo = await getWinDataMongo(todayDate);
+      // console.log('yesterdayString', yesterdayString);
+      const resYest = await getZeroCounter(yesterdayString);
+      if (resYest.length !== 0) {
+        setCounterFromMongoYesterday(resYest[0]);
+      }
+      console.log('zeroCounterYesterday', zeroCounterYesterday);
+      // console.log('zeroCounter', zeroCounter);
+
+      const res = await getZeroCounter(todayDate);
+      // console.log('res222', res);
+      if (res.length !== 0) {
+        setCounterFromMongo(res[0]);
+      }
+      // setZeroCounterDate(todayDate);
+
+      const winDataMongo = await getWinData(todayDate);
       winDataMongo.length !== 0 && setWinDataExist(true);
 
-      const under25DataMongo = await getUnder25Mongo(todayDate);
+      const under25DataMongo = await getUnder(todayDate);
       under25DataMongo.length !== 0 && setUnderDataExist(true);
 
       ((winDataMongo.length !== 0 &&
@@ -217,8 +279,11 @@ function App() {
         setCrawlDataExist(true);
     }
 
+    // console.log('zeroCounter', zeroCounter);
+
     todayDate && todayDate === format(new Date(), 'dd.MM.yyyy') && fetchData();
   }, [todayDate]);
+
   useEffect(() => {
     console.log('showZero', showZero);
 
@@ -292,7 +357,7 @@ function App() {
     const formattedDate = format(date, 'dd.MM.yyyy');
     setDate(formattedDate);
 
-    const resultsData = await getResultsMongo(formattedDate);
+    const resultsData = await getResult(formattedDate);
     resultsData.length !== 0 && setResultDataExist(true);
     addWin && setAddWinToBtts(false);
   }
@@ -300,37 +365,26 @@ function App() {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    const bttsDataMongo = await getBttsMongo(todayDate);
-
+    //GET BTTS
+    const bttsDataMongo = await getBtts(todayDate);
     bttsLocal.length !== 0 && setBttsLocal([]);
     setBttsLocal(bttsDataMongo);
-    // await setBtts(bttsDataMongo);
-    const winDataMongo = await getWinDataMongo(todayDate);
-    // const accasDataMongo = await getAccasMongo(todayDate);
 
+    //GET WIN
+    const winDataMongo = await getWinData(todayDate);
     winDataLocal.length !== 0 && setWinDataLocal([]);
     setWinDataLocal(winDataMongo);
 
-    // accasDataLocal.length !== 0 && setAccasDataLocal([]);
-    // setAccasDataLocal(accasDataMongo);
-
-    const under25DataMongo = await getUnder25Mongo(todayDate);
-    console.log('under25DataMongo', under25DataMongo);
-    let sortedUnder25 = under25DataMongo.sort((a, b) => {
-      if (a.homeTeam < b.homeTeam) {
-        return -1;
-      }
-      if (a.homeTeam > b.homeTeam) {
-        return 1;
-      }
-      return 0;
-    });
+    //GET UNDER
+    const under25DataMongo = await getUnder(todayDate);
+    let sortedUnder25 = sortData(under25DataMongo);
     under25DataLocal.length !== 0 && setUnder25DataLocal([]);
     setUnder25DataLocal(sortedUnder25);
 
-    const resultsTotalData = await getResultsTotalMongo(todayDate);
-    const resultsData = await getResultsMongo(todayDate);
-    console.log('resultsData', resultsData);
+    //GET RESULT AND TOTAL
+    const resultsTotalData = await getResultTotal(todayDate);
+    const resultsData = await getResult(todayDate);
+
     resultsLocal.length !== 0 && setResultsLocal([]);
     setResultsLocal(resultsData);
     setAllRes(resultsData);
@@ -341,8 +395,6 @@ function App() {
       bttsDataMongo.length !== 0 && countByProp(bttsDataMongo, 'source');
     const countedHomeTeamBtts =
       bttsDataMongo.length !== 0 && countByPropTeams(bttsDataMongo, 'homeTeam');
-    // console.log('countedHomeTeam', countedHomeTeam);
-    // console.log('countedObjBtts', countedObjBtts);
     countedObjBtts && setBttsSourcesCount(countedObjBtts);
     countedHomeTeamBtts && setBttsHomeTeamCount(countedHomeTeamBtts);
 
@@ -350,7 +402,6 @@ function App() {
       winDataMongo.length !== 0 && countByProp(winDataMongo, 'source');
     const countedPredTeam =
       winDataMongo.length !== 0 && countByPropTeams(winDataMongo, 'homeTeam');
-
     countedObjWin && setWinSourcesCount(countedObjWin);
     countedPredTeam && setWinPredTeamCount(countedPredTeam);
 
@@ -359,18 +410,8 @@ function App() {
     const countedHomeTeamUnder =
       under25DataMongo.length !== 0 &&
       countByPropTeams(under25DataMongo, 'homeTeam');
-    // console.log('countedHomeTeam', countedHomeTeam);
-    // console.log('countedObj', countedObj);
     countedObjUnder && setUnderSourcesCount(countedObjUnder);
     countedHomeTeamUnder && setUnderHomeTeamCount(countedHomeTeamUnder);
-
-    // const countedObj2 =
-    //   resultsTotalData.length !== 0 && countByProp(bttsDataMongo, 'source');
-    // countedObj2 && setResultTotalSourcesCount(countedObj2);
-    // resultsData.length !== 0 &&
-    //   resultsData.forEach((elem) => {
-    //     setResHomeTeamsArr((oldArray) => [...oldArray, elem.homeTeam]);
-    //   });
 
     await setResultsTotal(resultsTotalData);
 
@@ -401,10 +442,11 @@ function App() {
   //   setTodayBetPredsArr((prevArray) => [...prevArray, ...htArr]);
   // };
   const handleOverPredSubmit = async (e) => {
+    console.log('handleOverPredSubmit');
     e.preventDefault();
     const htArr = homeTeamTotalPred.split(',');
 
-    let result = await saveBttsMongo({
+    let result = await saveBtts({
       source: sourceTotalPred,
       action: predType,
       homeTeam: htArr,
@@ -424,7 +466,7 @@ function App() {
     e.preventDefault();
     const htArr = homeTeamTotalPred.split(',');
 
-    let result = await saveUnderMongo({
+    let result = await saveUnder({
       source: sourceTotalPred,
       action: predType,
       homeTeam: htArr,
@@ -462,7 +504,7 @@ function App() {
   const handleWinPredSubmit = async (e) => {
     e.preventDefault();
     // const htArr = homeTeamPred.split(',');
-    let result = await saveWinMongo({
+    let result = await saveWinData({
       source: sourceWinPred,
       action: 'win',
       homeTeam: [homeTeamWinPred],
@@ -478,6 +520,143 @@ function App() {
     } else {
       alert('Error while saving preds');
       return false;
+    }
+  };
+  const handleZeroResSubmit = async (e) => {
+    e.preventDefault();
+    console.log('zeroCounter', zeroCounter);
+    saveZeroCounter(zeroCounter);
+  };
+  const handleSaveMatches = async (e, title) => {
+    e.preventDefault();
+    console.log('e.target.value', matchesO25Tip);
+    switch (title) {
+      case 'o25tip':
+        pushMatches(matchesO25Tip, title);
+        setMatchesO25Tip('');
+        break;
+      case 'bettingtips_o25':
+        pushMatches(matchesBettingtips_o25, title);
+        setMatchesBettingtips_o25('');
+        break;
+      case 'wincomparator_o25':
+        pushMatches(matchesWincomparator_o25, title);
+        setMatchesWincomparator_o25('');
+        break;
+      case 'accum_btts':
+        pushMatches(matchesAccum_btts, title);
+        setMatchesAccum_btts('');
+        break;
+      case 'fst_btts':
+        pushMatches(matchesFst_btts, title);
+        setMatchesFst_btts('');
+        break;
+      case 'r2bet_o25':
+        pushMatches(matchesR2bet_o25, title);
+        setMatchesR2bet_o25('');
+        break;
+      case 'hello_o25':
+        pushMatches(matchesHello_o25, title);
+        setMatchesHello_o25('');
+        break;
+      case 'fbp_o25':
+        pushMatches(matchesFbp_o25, title);
+        setMatchesFbp_o25('');
+        break;
+      case 'fst_o25':
+        pushMatches(matchesFst_o25, title);
+        setMatchesFst_o25('');
+        break;
+      case 'footsuper_o25':
+        pushMatches(matchesFootsuper_o25, title);
+        setMatchesFootsuper_o25('');
+        break;
+      case 'footsuper_btts':
+        pushMatches(matchesFootsuper_btts, title);
+        setMatchesFootsuper_btts('');
+        break;
+      case 'bettingtips_btts':
+        pushMatches(matchesBettingtips_btts, title);
+        setMatchesBettingtips_btts('');
+        break;
+      case 'prot_o25':
+        pushMatches(matchesProt_o25, title);
+        setMatchesProt_o25('');
+        break;
+      case 'r2bet_btts':
+        pushMatches(matchesR2bet_btts, title);
+        setMatchesR2bet_btts('');
+        break;
+      case 'goalnow_o25':
+        pushMatches(matchesGoalnow_o25, title);
+        setMatchesGoalnow_o25('');
+        break;
+      case 'accum_o25':
+        pushMatches(matchesAccum_o25, title);
+        setMatchesAccum_o25('');
+        break;
+      case 'wincomparator_btts':
+        pushMatches(matchesWincomparator_btts, title);
+        setMatchesWincomparator_btts('');
+        break;
+      case 'wincomparator_win':
+        pushMatches(matchesWincomparator_win, title);
+        setMatchesWincomparator_win('');
+        break;
+      case 'mybets_win':
+        pushMatches(matchesMybets_win, title);
+        setMatchesMybets_win('');
+        break;
+      case 'venasbet_win':
+        pushMatches(matchesVenasbet_win, title);
+        setMatchesVenasbet_win('');
+        break;
+      case 'prot_win':
+        pushMatches(matchesProt_win, title);
+        setMatchesProt_win('');
+        break;
+      case 'footy_win':
+        pushMatches(matchesFooty_win, title);
+        setMatchesFooty_win('');
+        break;
+      case 'betgenuine_win':
+        pushMatches(matchesBetgenuine_win, title);
+        setMatchesBetgenuine_win('');
+        break;
+      case 'vitibet_win':
+        pushMatches(matchesVitibet_win, title);
+        setMatchesVitibet_win('');
+        break;
+      case 'r2bet_win':
+        pushMatches(matchesR2bet_win, title);
+        setMatchesR2bet_win('');
+        break;
+      case 'mines_win':
+        pushMatches(matchesMines_win, title);
+        setMatchesMines_win('');
+        break;
+      case 'passion_win':
+        pushMatches(matchesPassion_win, title);
+        setMatchesPassion_win('');
+        break;
+      case 'fbp_win':
+        pushMatches(matchesFbp_win, title);
+        setMatchesFbp_win('');
+        break;
+      case 'footsuper_win':
+        pushMatches(matchesFootsuper_win, title);
+        setMatchesFootsuper_win('');
+        break;
+      case 'hello_win':
+        pushMatches(matchesHello_win, title);
+        setMatchesHello_win('');
+        break;
+      case 'bettingtips_win':
+        pushMatches(matchesBettingtips_win, title);
+        setMatchesBettingtips_win('');
+        break;
+      default:
+        console.log(`Sorry, we are out of ${title}.`);
     }
   };
   const radioChangeHandler = (e) => {
@@ -697,6 +876,7 @@ function App() {
           <Tab label="Results" {...a11yProps(2)} />
           <Tab label="Under 25" {...a11yProps(3)} />
           <Tab label="Win Preds" {...a11yProps(4)} />
+          <Tab label="Zero Counter" {...a11yProps(5)} />
           {/* <Tab label="ACCAS" {...a11yProps(5)} /> */}
           {/*<Tab label="Item Four" {...a11yProps(3)} />
           <Tab label="Item Five" {...a11yProps(4)} />
@@ -964,15 +1144,21 @@ function App() {
                           elem.source === 'footsuper' ||
                           (elem.source === 'prot' &&
                             elem.action === 'over25') ||
-                            (elem.source === 'accum' &&
+                          (elem.source === 'accum' &&
                             elem.action === 'over25') ||
                           (elem.source === 'r2bet' && elem.action === 'btts') ||
+                          (elem.source === 'wincomparator' &&
+                            elem.action === 'btts') ||
+                          (elem.source === 'passion' &&
+                            elem.action === 'win') ||
+                          (elem.source === 'bettingtips' &&
+                            elem.action === 'btts') ||
                           (elem.source === 'r2bet' && elem.action === 'win') ||
                           (elem.source === 'mines' && elem.action === 'win') ||
-                          (elem.source === 'bettingtips' && elem.action === 'win') ||
-                          (elem.source === 'betgenuine' &&
+                          (elem.source === 'bettingtips' &&
                             elem.action === 'win') ||
                           (elem.source === 'fst' && elem.action === 'win') ||
+                          (elem.source === 'r2bet' && elem.action === 'XWin') ||
                           (elem.source === 'fbp' && elem.action === 'win') ||
                           (elem.source === 'footsuper' &&
                             elem.action === 'win') ||
@@ -1003,7 +1189,7 @@ function App() {
       <TabPanel value={value} index={1}>
         <h2>{`All Results: (${resultsLocal.length})`}</h2>
 
-        {resultDataExist && resultsLocal.length !== 0 && (
+        {resultsLocal.length !== 0 && (
           <button
             className={'button' + (showZero ? ' active' : '')}
             type="button"
@@ -1707,6 +1893,210 @@ function App() {
             </tbody>
           </table>
         )}
+      </TabPanel>
+      <TabPanel value={value} index={5}>
+        <h2>{`Zero Since 6 sept 2023 (${winDataLocal.length})`}</h2>
+
+        <form
+          onSubmit={handleZeroResSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'str',
+            minWidth: '40%',
+          }}
+        >
+          <Counter
+            title="o25tip_win"
+            increment={increment}
+            setMatches={setMatchesO25Tip}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="bettingtips_o25"
+            increment={increment}
+            setMatches={setMatchesBettingtips_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="wincomparator_o25"
+            increment={increment}
+            setMatches={setMatchesWincomparator_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="accum_btts"
+            increment={increment}
+            setMatches={setMatchesAccum_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="fst_btts"
+            increment={increment}
+            setMatches={setMatchesFst_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="r2bet_o25"
+            increment={increment}
+            setMatches={setMatchesR2bet_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="hello_o25"
+            increment={increment}
+            setMatches={setMatchesHello_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="fbp_o25"
+            increment={increment}
+            setMatches={setMatchesFbp_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="fst_o25"
+            increment={increment}
+            setMatches={setMatchesFst_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="footsuper_o25"
+            increment={increment}
+            setMatches={setMatchesFootsuper_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="footsuper_btts"
+            increment={increment}
+            setMatches={setMatchesFootsuper_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="bettingtips_btts"
+            increment={increment}
+            setMatches={setMatchesBettingtips_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="prot_o25"
+            increment={increment}
+            setMatches={setMatchesProt_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="r2bet_btts"
+            increment={increment}
+            setMatches={setMatchesR2bet_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="goalnow_o25"
+            increment={increment}
+            setMatches={setMatchesGoalnow_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="accum_o25"
+            increment={increment}
+            setMatches={setMatchesAccum_o25}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="wincomparator_btts"
+            increment={increment}
+            setMatches={setMatchesWincomparator_btts}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="wincomparator_win"
+            increment={increment}
+            setMatches={setMatchesWincomparator_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="mybets_win"
+            increment={increment}
+            setMatches={setMatchesMybets_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="venasbet_win"
+            increment={increment}
+            setMatches={setMatchesVenasbet_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="prot_win"
+            increment={increment}
+            setMatches={setMatchesProt_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="footy_win"
+            increment={increment}
+            setMatches={setMatchesFooty_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="betgenuine_win"
+            increment={increment}
+            setMatches={setMatchesBetgenuine_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="vitibet_win"
+            increment={increment}
+            setMatches={setMatchesVitibet_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="r2bet_win"
+            increment={increment}
+            setMatches={setMatchesR2bet_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="mines_win"
+            increment={increment}
+            setMatches={setMatchesMines_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="passion_win"
+            increment={increment}
+            setMatches={setMatchesPassion_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="fbp_win"
+            increment={increment}
+            setMatches={setMatchesFbp_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="footsuper_win"
+            increment={increment}
+            setMatches={setMatchesFootsuper_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="hello_win"
+            increment={increment}
+            setMatches={setMatchesHello_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="bettingtips_win"
+            increment={increment}
+            setMatches={setMatchesBettingtips_win}
+            saveMatches={handleSaveMatches}
+          />
+
+          <button class="button" type="submit">
+            Send to mongo
+          </button>
+        </form>
       </TabPanel>
       {/* <TabPanel value={value} index={3}>
         Item Four
