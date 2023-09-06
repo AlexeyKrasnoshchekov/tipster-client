@@ -1,19 +1,19 @@
 export const getBtts = async (date) => {
   const bttsAllMongo = await fetch(
-    `http://localhost:8000/btts/get/?date=${date}`
+    `https://tipster-server.vercel.app/btts/get/?date=${date}`
   );
   const bttsAllMongoJson = await bttsAllMongo.json();
   return bttsAllMongoJson;
 };
 export const loadBtts = async (date) => {
-  const res = await fetch(`http://localhost:8000/btts/load`);
+  const res = await fetch(`https://tipster-server.vercel.app/btts/load`);
   const text = await res.text();
   return text;
 };
 
 export const saveBtts = async (data) => {
     console.log('dataPred111', data);
-  const resp = await fetch(`http://localhost:8000/btts/save`, {
+  const resp = await fetch(`https://tipster-server.vercel.app/btts/save`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -31,7 +31,7 @@ export const saveBtts = async (data) => {
 };
 
 export const deleteBtts = async (date) => {
-  const res = await fetch(`http://localhost:8000/btts/delete`);
+  const res = await fetch(`https://tipster-server.vercel.app/btts/delete`);
   const text = await res.text();
   return text;
 };
