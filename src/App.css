@@ -26,13 +26,13 @@ ul {
   width: 15%;
 }
 .counter_matchesList {
-  width: 15%;
+  width: 13%;
 }
 .counter_prev {
-  width: 10%;
+  width: 7%;
 }
 .counter_today {
-  width: 10%;
+  width: 15%;
 }
 input[type='checkbox'] { display: none; } 
 .wrap-collabsible { margin: 1.2rem 0; } 

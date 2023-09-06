@@ -11,11 +11,6 @@ function Counter({
 }) {
   const { zeroCounterYesterday, zeroCounter } = useContext(context);
 
-  console.log('zeroCounterYesterday',zeroCounterYesterday);
-  console.log('zeroCounter',zeroCounter);
-  console.log('zeroCounterYesterday[title]',zeroCounterYesterday[title]);
-  console.log('zeroCounter[title]',zeroCounter[title]);
-
   return (
     <>
       {zeroCounterYesterday && zeroCounter && zeroCounterYesterday[title] && zeroCounter[title] &&
