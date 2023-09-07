@@ -119,6 +119,10 @@ const State = (props) => {
         total: 0,
         matches: [],
       },
+      vitibet_o25: {
+        total: 0,
+        matches: [],
+      },
       r2bet_win: {
         total: 0,
         matches: [],
@@ -151,7 +155,7 @@ const State = (props) => {
     },
     zeroCounter: {
       o25tip_win: {
-        total: 1,
+        total: 0,
         matches: [],
       },
       bettingtips_o25: {
@@ -243,6 +247,10 @@ const State = (props) => {
         matches: [],
       },
       vitibet_win: {
+        total: 0,
+        matches: [],
+      },
+      vitibet_o25: {
         total: 0,
         matches: [],
       },

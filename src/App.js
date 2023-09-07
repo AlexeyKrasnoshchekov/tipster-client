@@ -111,6 +111,7 @@ function App() {
   const [matchesFooty_win, setMatchesFooty_win] = useState('');
   const [matchesBetgenuine_win, setMatchesBetgenuine_win] = useState('');
   const [matchesVitibet_win, setMatchesVitibet_win] = useState('');
+  const [matchesVitibet_o25, setMatchesVitibet_o25] = useState('');
   const [matchesR2bet_win, setMatchesR2bet_win] = useState('');
   const [matchesMines_win, setMatchesMines_win] = useState('');
   const [matchesPassion_win, setMatchesPassion_win] = useState('');
@@ -159,7 +160,7 @@ function App() {
   }
   async function handleDeleteBtts() {
     setLoader(true);
-    const res = await deleteBtts();
+    const res = await deleteBtts(todayDate);
     res === 'btts deleted' && setBttsDataExist(false);
     setLoader(false);
   }
@@ -172,7 +173,7 @@ function App() {
   }
   async function handleDeleteUnder() {
     setLoader(true);
-    const res = await deleteUnder();
+    const res = await deleteUnder(todayDate);
     res === 'under deleted' && setUnderDataExist(false);
     setLoader(false);
   }
@@ -192,7 +193,7 @@ function App() {
   }
   async function handleDeleteOver() {
     setLoader(true);
-    const res = await deleteOverData();
+    const res = await deleteOverData(todayDate);
     res === 'over deleted' && setOverDataExist(false);
     setLoader(false);
   }
@@ -225,7 +226,7 @@ function App() {
   }
   async function handleDeleteResult() {
     setLoader(true);
-    const res = await deleteResult();
+    const res = await deleteResult(todayDate);
     res === 'result deleted' && setResultDataExist(false);
     setLoader(false);
   }
@@ -626,6 +627,10 @@ function App() {
       case 'vitibet_win':
         pushMatches(matchesVitibet_win, title);
         setMatchesVitibet_win('');
+        break;
+      case 'vitibet_o25':
+        pushMatches(matchesVitibet_o25, title);
+        setMatchesVitibet_o25('');
         break;
       case 'r2bet_win':
         pushMatches(matchesR2bet_win, title);
@@ -2084,6 +2089,12 @@ function App() {
             title="vitibet_win"
             increment={increment}
             setMatches={setMatchesVitibet_win}
+            saveMatches={handleSaveMatches}
+          />
+          <Counter
+            title="vitibet_o25"
+            increment={increment}
+            setMatches={setMatchesVitibet_o25}
             saveMatches={handleSaveMatches}
           />
           <Counter
