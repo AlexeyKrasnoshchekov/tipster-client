@@ -10,7 +10,7 @@ export const loadOverData = async () => {
   const text = await res.text();
   return text;
 };
-export const loadCrawlData = async (ate) => {
+export const loadCrawlData = async () => {
   const res = await fetch(`https://tipster-server.vercel.app/crawl/load`);
 //   const res = await fetch(`http://localhost:8000/crawl/load`);
   const text = await res.text();
