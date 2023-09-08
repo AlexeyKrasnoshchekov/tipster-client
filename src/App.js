@@ -526,7 +526,9 @@ function App() {
   const handleZeroResSubmit = async (e) => {
     e.preventDefault();
     console.log('zeroCounter', zeroCounter);
-    saveZeroCounter(zeroCounter);
+    const res = await saveZeroCounter(zeroCounter);;
+    res === 'new zero counter inserted' && alert('zero counter saved');
+    
   };
   const handleSaveMatches = async (e, title) => {
     e.preventDefault();
@@ -1152,10 +1154,13 @@ function App() {
                             : 'transparent' && elem.source === 'wdw'
                             ? '#fb5607'
                             : 'transparent',
-                        // border: elem.isAcca ? '4px dashed black' : 'none',
+                        border: elem.action === 'win' ? '3px dashed blue' : 'none',
                         opacity:
                           (elem.source === 'fbp' && elem.action === 'over25') ||
                           (elem.source === 'fst' && elem.action === 'over25') ||
+                          (elem.source === 'accum' && elem.action === 'btts') ||
+                          (elem.source === 'vitibet' && elem.action === 'over25') ||
+                          (elem.source === 'footsuper_o25' && elem.action === 'over25') ||
                           elem.source === 'footsuper' ||
                           (elem.source === 'prot' &&
                             elem.action === 'over25') ||
@@ -1169,12 +1174,16 @@ function App() {
                           (elem.source === 'bettingtips' &&
                             elem.action === 'btts') ||
                           (elem.source === 'r2bet' && elem.action === 'win') ||
-                          (elem.source === 'mines' && elem.action === 'win') ||
+                          (elem.source === 'mines' && (elem.action.includes('1') || elem.action.includes('2'))) ||
+                          (elem.source === 'prot' && elem.action === 'win') ||
+                          (elem.source === 'betgenuine' && elem.action === 'XWin') ||
+                          (elem.source === 'wincomparator' && elem.action === 'win') ||
                           (elem.source === 'bettingtips' &&
                             elem.action === 'win') ||
                           (elem.source === 'fst' && elem.action === 'win') ||
                           (elem.source === 'r2bet' && elem.action === 'XWin') ||
                           (elem.source === 'fbp' && elem.action === 'win') ||
+                          (elem.source === 'passion' && elem.action === 'win') ||
                           (elem.source === 'footsuper' &&
                             elem.action === 'win') ||
                           (elem.source === 'hello' && elem.action === 'XWin') ||
