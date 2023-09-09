@@ -1176,6 +1176,8 @@ function App() {
                           (elem.source === 'r2bet' && elem.action === 'win') ||
                           (elem.source === 'mines' && (elem.action.includes('1') || elem.action.includes('2'))) ||
                           (elem.source === 'prot' && elem.action === 'win') ||
+                          (elem.source === 'vitibet' && elem.action === 'win') ||
+                          (elem.source === 'venas' && elem.action === 'XWin') ||
                           (elem.source === 'betgenuine' && elem.action === 'XWin') ||
                           (elem.source === 'wincomparator' && elem.action === 'win') ||
                           (elem.source === 'bettingtips' &&
