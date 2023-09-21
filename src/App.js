@@ -46,9 +46,11 @@ function App() {
     pushMatches,
     setCounterFromMongo,
     setCounterFromMongoYesterday,
+    calcTotal,
   } = useContext(context);
 
-  console.log('zeroCounterYesterday', zeroCounterYesterday);
+  // console.log('zeroCounterYesterday', zeroCounterYesterday);
+  // console.log('zeroCounter', zeroCounter);
 
   const [bttsLocal, setBttsLocal] = useState([]);
   const [allRes, setAllRes] = useState([]);
@@ -256,7 +258,6 @@ function App() {
         setCounterFromMongoYesterday(resYest[0]);
       }
       console.log('zeroCounterYesterday', zeroCounterYesterday);
-      // console.log('zeroCounter', zeroCounter);
 
       const res = await getZeroCounter(todayDate);
       // console.log('res222', res);
@@ -264,6 +265,7 @@ function App() {
         setCounterFromMongo(res[0]);
       }
       // setZeroCounterDate(todayDate);
+      console.log('zeroCounter', zeroCounter);
 
       const winDataMongo = await getWinData(todayDate);
       winDataMongo.length !== 0 && setWinDataExist(true);
@@ -392,10 +394,28 @@ function App() {
     setResultsTotalLocal(resultsTotalData);
     setResultsTotalLocalFil(resultsTotalData);
 
-    const countedObjBtts =
+    let countedObjBtts =
       bttsDataMongo.length !== 0 && countByProp(bttsDataMongo, 'source');
+
+    //   console.log('countedObjBtts',countedObjBtts);
+
+    // let sources = Object.keys(zeroCounter).filter(elem => (elem.includes('btts') || elem.includes('over')));
+    // let sourcesCounted = Object.keys(countedObjBtts);
+
+    // console.log('sources',sources);
+    // console.log('sourcesCounted',sourcesCounted);
+
+    // countedObjBtts = sources.forEach(source => {
+    //   if (!sourcesCounted.includes(source)) {
+    //     const obj = {source: 0};
+    //     return {...countedObjBtts, ...obj}
+    //   }
+    // })
     const countedHomeTeamBtts =
       bttsDataMongo.length !== 0 && countByPropTeams(bttsDataMongo, 'homeTeam');
+
+    console.log('countedObjBtts', countedObjBtts);
+
     countedObjBtts && setBttsSourcesCount(countedObjBtts);
     countedHomeTeamBtts && setBttsHomeTeamCount(countedHomeTeamBtts);
 
@@ -525,10 +545,10 @@ function App() {
   };
   const handleZeroResSubmit = async (e) => {
     e.preventDefault();
-    console.log('zeroCounter', zeroCounter);
-    const res = await saveZeroCounter(zeroCounter);;
+    // console.log('zeroCounter', zeroCounter);
+    await calcTotal();
+    const res = await saveZeroCounter(zeroCounter);
     res === 'new zero counter inserted' && alert('zero counter saved');
-    
   };
   const handleSaveMatches = async (e, title) => {
     e.preventDefault();
@@ -733,6 +753,7 @@ function App() {
         {todayDate && todayDate !== '' ? (
           <div class="wrapper-actions">
             <h3>Действия</h3>
+
             {!loader ? (
               <div>
                 {todayDate &&
@@ -941,14 +962,14 @@ function App() {
               onChange={(e) => setSourceTotalPred(e.target.value)}
             >
               <option value="accum">accum</option>
-              <option value="fbp">fbp</option>
+              <option value="wdw">wdw</option>
               <option value="fst">fst</option>
               <option value="footsuper">footsuper</option>
               <option value="redscores">redscores</option>
               <option value="bettingtips">bettingtips</option>
               <option value="betshoot">betshoot</option>
-              <option value="wdw">wdw</option>
-              <option value="nvtips">nvtips</option>
+              <option value="o25tip_acc">o25tip_acc</option>
+              <option value="mines_acc">mines_acc</option>
               <option value="prot">prot</option>
             </select>
             <div className="radio-btn-container">
@@ -1107,29 +1128,43 @@ function App() {
                         backgroundColor:
                           elem.source === 'gnowAcc'
                             ? 'lightgray'
-                            : 'transparent' && elem.source === 'footy'
+                            : 'transparent' &&
+                              (elem.source === 'footy_o25' ||
+                                elem.source === 'footy_btts')
                             ? '#CCF5AC'
                             : 'transparent' && elem.source === 'morph'
                             ? '#006EAF'
                             : 'transparent' && elem.source === 'accum'
                             ? '#5BC0BE'
-                            : 'transparent' && elem.source === 'r2bet'
+                            : 'transparent' &&
+                              (elem.source === 'r2bet_o25' ||
+                                elem.source === 'r2bet_btts')
                             ? '#F9F5E3'
-                            : 'transparent' && elem.source === 'venas'
+                            : 'transparent' &&
+                              (elem.source === 'venas_o25' ||
+                                elem.source === 'venas_btts')
                             ? '#A95E4C'
-                            : 'transparent' && elem.source === 'passion'
+                            : 'transparent' && elem.source === 'passion_o25'
                             ? '#E1BC29'
-                            : 'transparent' && elem.source === 'fbp'
+                            : 'transparent' &&
+                              (elem.source === 'fbp_o25' ||
+                                elem.source === 'fbp_btts')
                             ? '#A095C6'
-                            : 'transparent' && elem.source === 'prot'
+                            : 'transparent' &&
+                              (elem.source === 'prot_o25' ||
+                                elem.source === 'prot_btts')
                             ? '#a2d2ff'
                             : 'transparent' && elem.source === 'footsuper'
                             ? '#fee440'
-                            : 'transparent' && elem.source === 'nerdy'
+                            : 'transparent' &&
+                              (elem.source === 'predutd_o25' ||
+                                elem.source === 'predutd_btts')
                             ? '#006EAF'
-                            : 'transparent' && elem.source === 'hello'
+                            : 'transparent' &&
+                              (elem.source === 'hello_o25' ||
+                                elem.source === 'hello_btts')
                             ? 'lightpink'
-                            : 'transparent' && elem.source === 'mines'
+                            : 'transparent' && elem.source === 'mines_o25'
                             ? 'green'
                             : 'transparent' && elem.source === 'redscores'
                             ? '#f72585'
@@ -1139,9 +1174,13 @@ function App() {
                             ? '#ffd8be'
                             : 'transparent' && elem.source === 'bettingtips_b'
                             ? '#ffd8be'
-                            : 'transparent' && elem.source === 'banker'
+                            : 'transparent' &&
+                              (elem.source === 'banker_o25' ||
+                                elem.source === 'banker_btts')
                             ? '#007ea7'
-                            : 'transparent' && elem.source === 'soccertipz'
+                            : 'transparent' &&
+                              (elem.source === 'soccertipz_o25' ||
+                                elem.source === 'soccertipz_btts')
                             ? '#70a288'
                             : 'transparent' && elem.source === 'wincomparator'
                             ? '#70a288'
@@ -1151,48 +1190,63 @@ function App() {
                             ? '#E19898'
                             : 'transparent' && elem.source === 'footsuper_o25'
                             ? '#CECE5A'
-                            : 'transparent' && elem.source === 'wdw'
+                            : 'transparent' &&
+                              (elem.source === 'fbpai_o25' ||
+                                elem.source === 'fbpai_btts')
                             ? '#fb5607'
                             : 'transparent',
-                        border: elem.action === 'win' ? '3px dashed blue' : 'none',
-                        opacity:
-                          (elem.source === 'fbp' && elem.action === 'over25') ||
-                          (elem.source === 'fst' && elem.action === 'over25') ||
-                          (elem.source === 'accum' && elem.action === 'btts') ||
-                          (elem.source === 'vitibet' && elem.action === 'over25') ||
-                          (elem.source === 'footsuper_o25' && elem.action === 'over25') ||
-                          elem.source === 'footsuper' ||
-                          (elem.source === 'prot' &&
-                            elem.action === 'over25') ||
-                          (elem.source === 'accum' &&
-                            elem.action === 'over25') ||
-                          (elem.source === 'r2bet' && elem.action === 'btts') ||
-                          (elem.source === 'wincomparator' &&
-                            elem.action === 'btts') ||
-                          (elem.source === 'passion' &&
-                            elem.action === 'win') ||
-                          (elem.source === 'bettingtips' &&
-                            elem.action === 'btts') ||
-                          (elem.source === 'r2bet' && elem.action === 'win') ||
-                          (elem.source === 'mines' && (elem.action.includes('1') || elem.action.includes('2'))) ||
-                          (elem.source === 'prot' && elem.action === 'win') ||
-                          (elem.source === 'vitibet' && elem.action === 'win') ||
-                          (elem.source === 'venas' && elem.action === 'XWin') ||
-                          (elem.source === 'betgenuine' && elem.action === 'XWin') ||
-                          (elem.source === 'wincomparator' && elem.action === 'win') ||
-                          (elem.source === 'bettingtips' &&
-                            elem.action === 'win') ||
-                          (elem.source === 'fst' && elem.action === 'win') ||
-                          (elem.source === 'r2bet' && elem.action === 'XWin') ||
-                          (elem.source === 'fbp' && elem.action === 'win') ||
-                          (elem.source === 'passion' && elem.action === 'win') ||
-                          (elem.source === 'footsuper' &&
-                            elem.action === 'win') ||
-                          (elem.source === 'hello' && elem.action === 'XWin') ||
-                          (elem.source === 'gnowAcc' &&
-                            elem.action === 'over25')
-                            ? 0.3
-                            : 1,
+                        fontWeight: elem.isAcca ? '700' : '400',
+                        border: elem.isAcca ? '4px dashed green' : 'none',
+                        // (elem.source.includes('fst')) ||
+                        // (elem.source === 'o25tip') ||
+                        // (elem.source === 'footsuper_o25' && elem.action === 'over25') ||
+                        // (elem.source === 'gnowAcc' && elem.action === 'over25') ||
+                        // (elem.source === 'hello_o25' && elem.action === 'over25') ||
+                        // (elem.source === 'footsuper_btts' && elem.action === 'btts') ||
+                        // (elem.source === 'bettingtips') ||
+                        // (elem.source.includes('r2bet')) ||
+                        // (elem.source === 'wincomparator') ||
+                        // (elem.source === 'accum')
+                        // ? '3px dashed blue' : 'none',
+                        // opacity:
+                        //   (elem.source === 'fbp' && elem.action === 'over25') ||
+                        //   (elem.source === 'fst' && elem.action === 'over25') ||
+                        //   (elem.source === 'accum' && elem.action === 'btts') ||
+                        //   (elem.source === 'vitibet' && elem.action === 'over25') ||
+                        //   (elem.source === 'footsuper_o25' && elem.action === 'over25') ||
+                        //   elem.source === 'footsuper' ||
+                        //   (elem.source === 'prot' &&
+                        //     elem.action === 'over25') ||
+                        //   (elem.source === 'accum' &&
+                        //     elem.action === 'over25') ||
+                        //   (elem.source === 'r2bet' && elem.action === 'btts') ||
+                        //   (elem.source === 'r2bet' && elem.action === 'over25') ||
+                        //   (elem.source === 'wincomparator' &&
+                        //     elem.action === 'btts') ||
+                        //   (elem.source === 'passion' &&
+                        //     elem.action === 'win') ||
+                        //   (elem.source === 'bettingtips' &&
+                        //     elem.action === 'btts') ||
+                        //   (elem.source === 'r2bet' && elem.action === 'win') ||
+                        //   (elem.source === 'mines' && (elem.action.includes('1') || elem.action.includes('2'))) ||
+                        //   (elem.source === 'prot' && elem.action === 'win') ||
+                        //   (elem.source === 'vitibet' && elem.action === 'win') ||
+                        //   (elem.source === 'venas' && elem.action === 'XWin') ||
+                        //   (elem.source === 'betgenuine' && elem.action === 'XWin') ||
+                        //   (elem.source === 'wincomparator' && elem.action === 'win') ||
+                        //   (elem.source === 'bettingtips' &&
+                        //     elem.action === 'win') ||
+                        //   (elem.source === 'fst' && elem.action === 'win') ||
+                        //   (elem.source === 'r2bet' && elem.action === 'XWin') ||
+                        //   (elem.source === 'fbp' && elem.action === 'win') ||
+                        //   (elem.source === 'passion' && elem.action === 'win') ||
+                        //   (elem.source === 'footsuper' &&
+                        //     elem.action === 'win') ||
+                        //   (elem.source === 'hello' && elem.action === 'XWin') ||
+                        //   (elem.source === 'gnowAcc' &&
+                        //     elem.action === 'over25')
+                        //     ? 0.3
+                        //     : 1,
                       }}
                     >
                       <td className="cell width20">{elem.homeTeam}</td>
@@ -1517,7 +1571,7 @@ function App() {
               <option value="footsuper">footsuper</option>
               <option value="predutd">predutd</option>
               <option value="fbp">fbp</option>
-              <option value="nvtips">nvtips</option>
+              <option value="mines">mines</option>
               <option value="fst">fst</option>
               <option value="accum">accum</option>
             </select>
@@ -1888,17 +1942,18 @@ function App() {
                             : 'transparent' && elem.source === 'wdw'
                             ? '#fb5607'
                             : 'transparent',
-                        border: elem.isAcca
-                          ? '4px dashed black'
-                          : 'none' && elem.source === 'betgenuine'
-                          ? '4px dashed black'
-                          : 'none' && elem.source === 'o25tip'
-                          ? '4px dashed black'
-                          : 'none' && elem.source === 'vitibet'
-                          ? '4px dashed black'
-                          : 'none' && elem.source === 'wincomparator'
-                          ? '4px dashed black'
-                          : 'none',
+                        border:
+                          elem.source === 'betgenuine'
+                            ? '4px dashed black'
+                            : 'none' && elem.source === 'vitibet'
+                            ? '4px dashed black'
+                            : 'none' && elem.source === 'bettingtips_b'
+                            ? '4px dashed black'
+                            : 'none' && elem.source === 'o25tip'
+                            ? '4px dashed black'
+                            : 'none' && elem.source === 'wincomparator'
+                            ? '4px dashed black'
+                            : 'none',
                         opacity:
                           elem.source === 'r2bet' ||
                           elem.source === 'mines' ||

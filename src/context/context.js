@@ -9,6 +9,7 @@ import {
   PUSH_MATCHES,
   SET_COUNTER_MONGO,
   SET_COUNTER_MONGO_YEST,
+  CALC
 } from './reducer';
 export const context = createContext();
 
@@ -299,6 +300,13 @@ const State = (props) => {
     console.log('incrementO25');
     dispatch({ type: INCREMENT, payload: source });
   };
+  const calcTotal = () => {
+    console.log('calcTotal');
+    Object.keys(state.zeroCounter).forEach(key => {
+      key !== '_id' && key !== 'date' && state.zeroCounter[key] && dispatch({ type: CALC, payload: key });
+    })
+    
+  };
 
   const setCounterFromMongoYesterday = (ZeroCounter) => {
     console.log('ZeroCounter', ZeroCounter);
@@ -330,6 +338,7 @@ const State = (props) => {
         pushMatches,
         setCounterFromMongo,
         setCounterFromMongoYesterday,
+        calcTotal
       }}
     >
       {props.children}

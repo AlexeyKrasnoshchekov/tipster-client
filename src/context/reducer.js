@@ -5,6 +5,7 @@ export const INCREMENT = "INCREMENT";
 export const PUSH_MATCHES = "PUSH_MATCHES";
 export const SET_COUNTER_MONGO = "SET_COUNTER_MONGO";
 export const SET_COUNTER_MONGO_YEST = "SET_COUNTER_MONGO_YEST";
+export const CALC = "CALC";
 // export const SET_DATE = "SET_DATE";
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -46,10 +47,24 @@ export default (state, action) => {
           ...state.zeroCounter,
           [action.payload]: {
             ...state.zeroCounter[action.payload],
-            total: state.zeroCounterYesterday[action.payload].total + state.zeroCounter[action.payload].total + 1
+            total: state.zeroCounter[action.payload].total + 1
           },
         },
       };
+    case CALC:
+      console.log('action.payload',action.payload)
+      return {
+        ...state,
+        zeroCounter: {
+          ...state.zeroCounter,
+          [action.payload]: {
+            ...state.zeroCounter[action.payload],
+            total: state.zeroCounterYesterday[action.payload].total + state.zeroCounter[action.payload].total
+          },
+        },
+      };
+
+      
     case PUSH_MATCHES:
       console.log('action.payload',action.payload)
       return {
