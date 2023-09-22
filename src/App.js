@@ -27,7 +27,7 @@ import {
   saveZeroCounter,
 } from './api/result';
 import { deleteOverData, loadCrawlData, loadOverData } from './api/over';
-import { sortData } from './utils';
+import { getHomeTeamName, sortData } from './utils';
 import Counter from './components/counter';
 
 function App() {
@@ -369,17 +369,34 @@ function App() {
     event.preventDefault();
 
     //GET BTTS
-    const bttsDataMongo = await getBtts(todayDate);
+    let bttsDataMongo = await getBtts(todayDate);
+    bttsDataMongo = bttsDataMongo.map(elem => {
+      let obj = {...elem};
+      obj.homeTeam = getHomeTeamName(elem.homeTeam);
+      return obj;
+    });
+    console.log('bttsDataMongo444',bttsDataMongo);
     bttsLocal.length !== 0 && setBttsLocal([]);
     setBttsLocal(bttsDataMongo);
 
     //GET WIN
-    const winDataMongo = await getWinData(todayDate);
+    let winDataMongo = await getWinData(todayDate);
+    winDataMongo = winDataMongo.map(elem => {
+      let obj = {...elem};
+      obj.homeTeam = getHomeTeamName(elem.homeTeam);
+      obj.prediction = getHomeTeamName(elem.prediction);
+      return obj;
+    });
     winDataLocal.length !== 0 && setWinDataLocal([]);
     setWinDataLocal(winDataMongo);
 
     //GET UNDER
-    const under25DataMongo = await getUnder(todayDate);
+    let under25DataMongo = await getUnder(todayDate);
+    under25DataMongo = under25DataMongo.map(elem => {
+      let obj = {...elem};
+      obj.homeTeam = getHomeTeamName(elem.homeTeam);
+      return obj;
+    });
     let sortedUnder25 = sortData(under25DataMongo);
     under25DataLocal.length !== 0 && setUnder25DataLocal([]);
     setUnder25DataLocal(sortedUnder25);
