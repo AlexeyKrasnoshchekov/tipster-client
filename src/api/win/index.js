@@ -27,15 +27,15 @@ export const saveWinData = async (data) => {
 };
 
 export const loadWin = async () => {
-  // const res = await fetch(`https://tipster-server.vercel.app/win/load`);
-  const res = await fetch(`http://localhost:8000/win/load`);
+  const res = await fetch(`https://tipster-server.vercel.app/win/load`);
+  // const res = await fetch(`http://localhost:8000/win/load`);
   const text = await res.text();
   return text;
 };
 
 export const deleteWin = async (date) => {
-  // const res = await fetch(`https://tipster-server.vercel.app/win/delete/?date=${date}`);
-  const res = await fetch(`http://localhost:8000/win/delete/?date=${date}`);
+  const res = await fetch(`https://tipster-server.vercel.app/win/delete/?date=${date}`);
+  // const res = await fetch(`http://localhost:8000/win/delete/?date=${date}`);
   const text = await res.text();
   return text;
 };

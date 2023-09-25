@@ -56,8 +56,8 @@ export const getResultTotal = async (date) => {
   return resultsTotalJson;
 };
 export const saveResultTotal = async () => {
-    // const res = await fetch(`https://tipster-server.vercel.app/total/save`);
-    const res = await fetch(`http://localhost:8000/total/save`);
+    const res = await fetch(`https://tipster-server.vercel.app/total/save`);
+    // const res = await fetch(`http://localhost:8000/total/save`);
     const text = await res.text();
     return text;
 };
