@@ -17,6 +17,7 @@ import { getClubStat } from './api/getClubStat';
 import { deleteBtts, getBtts, loadBtts, saveBtts } from './api/btts';
 import { deleteUnder, getUnder, loadUnder, saveUnder } from './api/under';
 import { deleteWin, getWinData, loadWin, saveWinData } from './api/win';
+import { loadTest } from './api/test';
 import {
   deleteResult,
   getResult,
@@ -370,19 +371,19 @@ function App() {
 
     //GET BTTS
     let bttsDataMongo = await getBtts(todayDate);
-    bttsDataMongo = bttsDataMongo.map(elem => {
-      let obj = {...elem};
+    bttsDataMongo = bttsDataMongo.map((elem) => {
+      let obj = { ...elem };
       obj.homeTeam = getHomeTeamName(elem.homeTeam);
       return obj;
     });
-    console.log('bttsDataMongo444',bttsDataMongo);
+    console.log('bttsDataMongo444', bttsDataMongo);
     bttsLocal.length !== 0 && setBttsLocal([]);
     setBttsLocal(bttsDataMongo);
 
     //GET WIN
     let winDataMongo = await getWinData(todayDate);
-    winDataMongo = winDataMongo.map(elem => {
-      let obj = {...elem};
+    winDataMongo = winDataMongo.map((elem) => {
+      let obj = { ...elem };
       obj.homeTeam = getHomeTeamName(elem.homeTeam);
       obj.prediction = getHomeTeamName(elem.prediction);
       return obj;
@@ -392,8 +393,8 @@ function App() {
 
     //GET UNDER
     let under25DataMongo = await getUnder(todayDate);
-    under25DataMongo = under25DataMongo.map(elem => {
-      let obj = {...elem};
+    under25DataMongo = under25DataMongo.map((elem) => {
+      let obj = { ...elem };
       obj.homeTeam = getHomeTeamName(elem.homeTeam);
       return obj;
     });
@@ -761,9 +762,14 @@ function App() {
               onSelect={onSelect}
             />
             {todayDate && (
-              <button class="button" type="submit">
-                Get Data
-              </button>
+              <>
+                <button class="button" type="submit">
+                  Get Data
+                </button>
+                <button class="button" onClick={loadTest}>
+                  Load Test
+                </button>
+              </>
             )}
           </form>
         </div>

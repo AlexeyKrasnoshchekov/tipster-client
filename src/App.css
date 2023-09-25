@@ -70,7 +70,7 @@ input[type='checkbox'] { display: none; }
     transition: max-height .25s ease-in-out; 
   } 
   .toggle:checked + .lbl-toggle + .collapsible-content { 
-    max-height: 2400px; 
+    max-height: 4000px; 
   } 
   .toggle:checked+.lbl-toggle { 
     border-bottom-right-radius: 0; border-bottom-left-radius: 0; 

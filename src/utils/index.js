@@ -286,16 +286,78 @@ export function getHomeTeamName(name) {
       return 'Baniyas';
     case 'Bani Yas':
       return 'Baniyas';
+    case '1. FC Union Berlin':
+      return 'Union Berlin';
     case 'Arsenal London':
       return 'Arsenal';
     case 'PEC Zwolle':
       return 'Zwolle';
+    case 'AC Omonia':
+      return 'Omonia';
+    case 'Coventry City':
+      return 'Coventry';
+    case 'Breidablik Kopavogur':
+      return 'Breidablik';
+    case 'FC Augsburg':
+      return 'Augsburg';
+    case 'FC Sion':
+      return 'Sion';
+    case 'St Patricks Athletic':
+      return 'St Patricks';
+    case 'St. Patricks Athletic':
+      return 'St Patricks';
+    case 'St. Patricks':
+      return 'St Patricks';
+    case 'Omonia Nicosia':
+      return 'Omonia';
+    case 'Pyunik Yerevan FC':
+      return 'Pyunik Yerevan';
+    case 'FC Pyunik Yerevan':
+      return 'Pyunik Yerevan';
+    case 'Gabala FK':
+      return 'Gabala';
+    case 'Racing de Ferrol':
+      return 'Racing Ferrol';
+    case 'Ferrol':
+      return 'Racing Ferrol';
+    case 'Galway United':
+      return 'Galway';
+    case 'Halmstads BK':
+      return 'Halmstad';
+    case 'FK Varnamo':
+      return 'Varnamo';
+    case 'FC Nordsjaeland':
+      return 'Nordsjaeland';
+    case 'FC Nordsjælland':
+      return 'Nordsjaeland';
+    case 'FC Nordsjaelland':
+      return 'Nordsjaeland';
+    case 'Dalian Professional':
+      return 'Dalian Pro';
+    case 'Charlton Athletic':
+      return 'Charlton';
     case 'CFR 1907 Cluj':
       return 'CFR Cluj';
+    case 'FC Volendam':
+      return 'Volendam';
     case 'Al-Rayyan SC':
       return 'Al Rayyan';
     case 'Maringá':
       return 'Maringa';
+    case 'Red Bull Salzburg':
+      return 'Salzburg';
+    case 'Plymouth Argyle':
+      return 'Plymouth';
+    case 'Ipswich Town':
+      return 'Ipswich';
+    case 'FC Porto':
+      return 'Porto';
+    case 'Almere City FC':
+      return 'Almere City';
+    case 'B. Monchengladbach':
+      return 'Borussia Monchengladbach';
+    case 'Borussia Mönchengladbach':
+      return 'Borussia Monchengladbach';
     case 'Real Madrid CF':
       return 'Real Madrid';
     case 'FC Bayern Munich':
@@ -476,6 +538,8 @@ export function getHomeTeamName(name) {
       return 'Nova Mutum';
     case 'Alkmaar':
       return 'AZ Alkmaar';
+    case 'FC Aarau':
+      return 'Aarau';
     case 'Beşiktaş':
       return 'Besiktas';
     case 'Eyüpspor':
