@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { context } from './context/context';
 import './App.css';
 // import { getResultsMongo } from './api/getResultsMongo';
@@ -14,9 +14,27 @@ import { Box } from '@mui/material';
 import { deleteResultsTotalMongo } from './api/deleteResultsTotalMongo';
 import { getClubStat } from './api/getClubStat';
 
-import { deleteBtts, getBtts, loadBtts, saveBtts } from './api/btts';
-import { deleteUnder, getUnder, loadUnder, saveUnder } from './api/under';
-import { deleteWin, getWinData, loadWin, saveWinData } from './api/win';
+import {
+  deleteBtts,
+  getBtts,
+  loadBtts,
+  loadBttsWithVpn,
+  saveBtts,
+} from './api/btts';
+import {
+  deleteUnder,
+  getUnder,
+  loadUnder,
+  loadUnderWithVpn,
+  saveUnder,
+} from './api/under';
+import {
+  deleteWin,
+  getWinData,
+  loadWin,
+  loadWinWithVpn,
+  saveWinData,
+} from './api/win';
 import { loadTest } from './api/test';
 import {
   deleteResult,
@@ -27,9 +45,16 @@ import {
   saveResultTotal,
   saveZeroCounter,
 } from './api/result';
-import { deleteOverData, loadCrawlData, loadOverData } from './api/over';
+import {
+  deleteOverData,
+  loadCrawlData,
+  loadOverData,
+  loadOverDataWithVpn,
+} from './api/over';
 import { getHomeTeamName, sortData } from './utils';
 import Counter from './components/counter';
+import { deleteDraw, getDraw, loadDraw, loadDrawWithVpn } from './api/draw';
+import Table from './components/table';
 
 function App() {
   const today = new Date();
@@ -42,9 +67,15 @@ function App() {
   const {
     setResultsTotal,
     zeroCounter,
-    zeroCounterYesterday,
     increment,
     pushMatches,
+    bttsSources,
+    o25Sources,
+    u25Sources,
+    winSources,
+    drawSources,
+    setBttsSources,
+    setO25Sources,
     setCounterFromMongo,
     setCounterFromMongoYesterday,
     calcTotal,
@@ -53,11 +84,21 @@ function App() {
   // console.log('zeroCounterYesterday', zeroCounterYesterday);
   // console.log('zeroCounter', zeroCounter);
 
+  //production arrays
+  const [productionBttsLocal, setProductionBtts] = useState([]);
+  const [productionOverLocal, setProductionOver] = useState([]);
+  const [productionUnderLocal, setProductionUnder] = useState([]);
+  const [productionWinLocal, setProductionWin] = useState([]);
+  const [productionDrawLocal, setProductionDraw] = useState([]);
+
   const [bttsLocal, setBttsLocal] = useState([]);
+  const [bttsOnlyLocal, setBttsOnlyLocal] = useState([]);
+  const [overLocal, setOverLocal] = useState([]);
   const [allRes, setAllRes] = useState([]);
   // const [bttsWLLocal, setBttsWLLocal] = useState([]);
   // const [isInclude, setIsInclude] = useState(false);
   const [winDataLocal, setWinDataLocal] = useState([]);
+  const [drawDataLocal, setDrawDataLocal] = useState([]);
   // const [accasDataLocal, setAccasDataLocal] = useState([]);
   const [under25DataLocal, setUnder25DataLocal] = useState([]);
   const [resultsLocal, setResultsLocal] = useState([]);
@@ -70,6 +111,8 @@ function App() {
   const [bttsSourcesCount, setBttsSourcesCount] = useState({});
   const [bttsHomeTeamCount, setBttsHomeTeamCount] = useState({});
   const [winSourcesCount, setWinSourcesCount] = useState({});
+  const [drawSourcesCount, setDrawSourcesCount] = useState({});
+  const [teamDrawCount, setTeamDrawCount] = useState({});
   const [underSourcesCount, setUnderSourcesCount] = useState({});
   const [underHomeTeamCount, setUnderHomeTeamCount] = useState({});
   const [winPredTeamCount, setWinPredTeamCount] = useState({});
@@ -81,7 +124,9 @@ function App() {
 
   //for buttons
   const [winDataExist, setWinDataExist] = useState(false);
+  const [drawDataExist, setDrawDataExist] = useState(false);
   const [bttsDataExist, setBttsDataExist] = useState(false);
+  const [vpnDataExist, setVpnDataExist] = useState(false);
   const [overDataExist, setOverDataExist] = useState(false);
   const [crawlDataExist, setCrawlDataExist] = useState(false);
   const [resultDataExist, setResultDataExist] = useState(false);
@@ -89,7 +134,8 @@ function App() {
   const [underDataExist, setUnderDataExist] = useState(false);
 
   //zero counter match inputs state
-  const [matchesO25Tip, setMatchesO25Tip] = useState('');
+  const [matchesO25Tip_win, setMatchesO25Tip_win] = useState('');
+  const [matchesO25Tip_high, setMatchesO25Tip_high] = useState('');
   const [matchesBettingtips_o25, setMatchesBettingtips_o25] = useState('');
   const [matchesWincomparator_o25, setMatchesWincomparator_o25] = useState('');
   const [matchesAccum_btts, setMatchesAccum_btts] = useState('');
@@ -137,6 +183,42 @@ function App() {
   // const [sourceAccaPred, setSourceAccaPred] = useState('betshoot');
   const [sourceWinPred, setSourceWinPred] = useState('footsuper');
 
+  //TABLE
+  const columnsBttsProd = [
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            Header: "Count",
+            accessor: "count",
+          },
+          {
+            Header: "Acc Count",
+            accessor: "numAcca",
+          },
+          {
+            Header: "Btts Yes Count",
+            accessor: "bttsYesNum",
+          },
+          {
+            Header: "Btts No Count",
+            accessor: "bttsNoNum",
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Btts Yes",
+            accessor: "bttsYes",
+          },
+        ];
+
   // console.log('sourceAccaPred', sourceAccaPred);
   // console.log('predTypeAcca', predTypeAcca);
 
@@ -145,6 +227,84 @@ function App() {
 
   function handleChange(event, newValue) {
     setValue(newValue);
+  }
+  async function handleLoadResProd() {
+    console.log('resultsLocal333')
+    for (let i = 0; i < resultsLocal.length; i++) {
+      for (let j = 0; j < productionBttsLocal.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === productionBttsLocal[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+
+          productionBttsLocal[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(productionBttsLocal[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(productionBttsLocal[j].homeTeam)
+        ) {
+          productionBttsLocal[j].resultScore = resultsLocal[i].score;
+          productionBttsLocal[j].bttsYes = parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 &&
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0;
+        }
+      }
+      for (let j = 0; j < productionOverLocal.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === productionOverLocal[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+          productionOverLocal[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(productionOverLocal[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(productionOverLocal[j].homeTeam)
+        ) {
+          productionOverLocal[j].resultScore = resultsLocal[i].score;
+          productionOverLocal[j].overYes = parseInt(resultsLocal[i].score.split(' - ')[0]) +
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 2;
+        }
+      }
+      for (let j = 0; j < productionUnderLocal.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === productionUnderLocal[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+          productionUnderLocal[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(productionUnderLocal[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(productionUnderLocal[j].homeTeam)
+        ) {
+          productionUnderLocal[j].resultScore = resultsLocal[i].score;
+          productionUnderLocal[j].underYes = parseInt(resultsLocal[i].score.split(' - ')[0]) +
+          parseInt(resultsLocal[i].score.split(' - ')[1]) < 3;
+        }
+      }
+      for (let j = 0; j < productionWinLocal.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === productionWinLocal[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+          productionWinLocal[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(productionWinLocal[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(productionWinLocal[j].homeTeam)
+        ) {
+          productionWinLocal[j].resultScore = resultsLocal[i].score;
+          let win1 = parseInt(resultsLocal[i].score.split(' - ')[0]) > parseInt(resultsLocal[i].score.split(' - ')[1]);
+          let win2 = parseInt(resultsLocal[i].score.split(' - ')[0]) < parseInt(resultsLocal[i].score.split(' - ')[1]);
+          productionWinLocal[j].winYes = (win1 && productionWinLocal[j].homeTeam === productionWinLocal[j].prediction) || (win2 && productionWinLocal[j].awayTeam === productionWinLocal[j].prediction);
+        }
+      }
+      for (let j = 0; j < productionDrawLocal.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === productionDrawLocal[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+          productionDrawLocal[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(productionDrawLocal[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(productionDrawLocal[j].homeTeam)
+        ) {
+          productionDrawLocal[j].resultScore = resultsLocal[i].score;
+          productionDrawLocal[j].drawYes = parseInt(resultsLocal[i].score.split(' - ')[0]) ===
+          parseInt(resultsLocal[i].score.split(' - ')[1]);
+        }
+      }
+    }
+    
   }
   function toggleZero() {
     console.log('toggleZero');
@@ -155,6 +315,21 @@ function App() {
     setAddWinToBtts((current) => !current);
   }
 
+  async function handleLoadWithVpn() {
+    setLoader(true);
+    const res = await loadBttsWithVpn();
+    const res2 = await loadOverDataWithVpn();
+    const res3 = await loadWinWithVpn();
+    const res4 = await loadDrawWithVpn();
+    const res5 = await loadUnderWithVpn();
+    res === 'btts VPN loaded' &&
+      res2 === 'over VPN loaded' &&
+      res3 === 'win VPN loaded' &&
+      res4 === 'draws VPN loaded' &&
+      res5 === 'under VPN loaded' &&
+      setVpnDataExist(true);
+    vpnDataExist && setLoader(false);
+  }
   async function handleLoadBtts() {
     setLoader(true);
     const res = await loadBtts();
@@ -181,6 +356,12 @@ function App() {
     setLoader(false);
   }
 
+  async function handleLoadTotal1() {
+    setTotalLoader(true);
+    const res = await saveResultTotal();
+    res === 'total loaded' && setTotalDataExist(true);
+    setTotalLoader(false);
+  }
   async function handleLoadTotal() {
     setTotalLoader(true);
     const res = await saveResultTotal();
@@ -216,12 +397,26 @@ function App() {
   }
   async function handleDeleteWin() {
     setLoader(true);
-    const res = await deleteWin();
+    console.log('todayDateWin', todayDate);
+    const res = await deleteWin(todayDate);
     res === 'win deleted' && setWinDataExist(false);
     setLoader(false);
   }
 
-  async function handleLoadResult() {
+  async function handleLoadDraw() {
+    setLoader(true);
+    const res = await loadDraw();
+    res === 'draws loaded' && setDrawDataExist(true);
+    setLoader(false);
+  }
+  async function handleDeleteDraw() {
+    setLoader(true);
+    const res = await deleteDraw(todayDate);
+    res === 'draws deleted' && setDrawDataExist(false);
+    setLoader(false);
+  }
+
+  async function Prodult() {
     setLoader(true);
     const res = await loadResult();
     res === 'result loaded' && setResultDataExist(true);
@@ -242,6 +437,64 @@ function App() {
   //   setBttsLocal(bttsDataMongo);
   // }
 
+  // useEffect(() => {
+  //   if (bttsLocal.length !== 0 && bttsSources) {
+  //     if (bttsLocal.some((elem) => elem.source === 'fbp_acc_btts')) {
+  //       bttsSources['fbp_acc_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'footsuper_btts')) {
+  //       bttsSources['footsuper_btts'].exist = true;
+  //     } else if (
+  //       bttsLocal.some((elem) => elem.source === 'footsuper_acc_btts')
+  //     ) {
+  //       bttsSources['footsuper_acc_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'r2bet_btts')) {
+  //       bttsSources['r2bet_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'footy_btts')) {
+  //       bttsSources['footy_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'predutd_btts')) {
+  //       bttsSources['predutd_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'mighty_btts')) {
+  //       bttsSources['mighty_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'betimate_btts')) {
+  //       bttsSources['betimate_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'kcpredict_btts')) {
+  //       bttsSources['kcpredict_btts'].exist = true;
+  //     } else if (
+  //       bttsLocal.some((elem) => elem.source === 'trustpredict_btts')
+  //     ) {
+  //       bttsSources['trustpredict_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'accum_btts')) {
+  //       bttsSources['accum_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'banker_btts')) {
+  //       bttsSources['banker_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'venas_btts')) {
+  //       bttsSources['venas_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'goalsnow_btts')) {
+  //       bttsSources['goalsnow_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'prot_btts')) {
+  //       bttsSources['prot_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'betshoot_btts')) {
+  //       bttsSources['betshoot_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'betclan_btts')) {
+  //       bttsSources['betclan_btts'].exist = true;
+  //     } else if (
+  //       bttsLocal.some((elem) => elem.source === 'wincomparator_btts')
+  //     ) {
+  //       bttsSources['wincomparator_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'bettingtips_btts')) {
+  //       bttsSources['bettingtips_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'betprotips_btts')) {
+  //       bttsSources['betprotips_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'vitibet_btts')) {
+  //       bttsSources['vitibet_btts'].exist = true;
+  //     } else if (bttsLocal.some((elem) => elem.source === 'passion_btts')) {
+  //       bttsSources['passion_btts'].exist = true;
+  //     }
+  //   }
+
+  //   console.log('bttsSources222',bttsSources);
+  // }, [bttsLocal, bttsSources]);
+
   useEffect(() => {
     async function fetchData() {
       const bttsDataMongo = await getBtts(todayDate);
@@ -254,33 +507,38 @@ function App() {
         setOverDataExist(true);
 
       // console.log('yesterdayString', yesterdayString);
-      const resYest = await getZeroCounter(yesterdayString);
-      if (resYest.length !== 0) {
-        setCounterFromMongoYesterday(resYest[0]);
-      }
-      console.log('zeroCounterYesterday', zeroCounterYesterday);
+      // const resYest = await getZeroCounter(yesterdayString);
+      // if (resYest.length !== 0) {
+      //   setCounterFromMongoYesterday(resYest[0]);
+      // }
+      // console.log('zeroCounterYesterday', zeroCounterYesterday);
 
       const res = await getZeroCounter(todayDate);
-      // console.log('res222', res);
-      if (res.length !== 0) {
-        setCounterFromMongo(res[0]);
-      }
+      console.log('res222', res);
+      // if (res.length !== 0) {
+      //   setCounterFromMongo(res[0]);
+      // }
       // setZeroCounterDate(todayDate);
-      console.log('zeroCounter', zeroCounter);
+      // console.log('zeroCounter', zeroCounter);
 
       const winDataMongo = await getWinData(todayDate);
-      winDataMongo.length !== 0 && setWinDataExist(true);
+      winDataMongo.length !== 0 &&
+        winDataMongo.some((elem) => elem.source === 'hello') &&
+        setWinDataExist(true);
+
+      const drawDataMongo = await getDraw(todayDate);
+      drawDataMongo.length !== 0 && setDrawDataExist(true);
 
       const under25DataMongo = await getUnder(todayDate);
       under25DataMongo.length !== 0 && setUnderDataExist(true);
 
-      ((winDataMongo.length !== 0 &&
-        (winDataMongo.some((elem) => elem.source === 'bettingtips') ||
-          winDataMongo.some((elem) => elem.source === 'wincomparator'))) ||
-        (bttsDataMongo.length !== 0 &&
-          (bttsDataMongo.some((elem) => elem.source === 'bettingtips') ||
-            bttsDataMongo.some((elem) => elem.source === 'wincomparator')))) &&
-        setCrawlDataExist(true);
+      // ((winDataMongo.length !== 0 &&
+      //   (winDataMongo.some((elem) => elem.source === 'bettingtips') ||
+      //     winDataMongo.some((elem) => elem.source === 'wincomparator'))) ||
+      //   (bttsDataMongo.length !== 0 &&
+      //     (bttsDataMongo.some((elem) => elem.source === 'bettingtips') ||
+      //       bttsDataMongo.some((elem) => elem.source === 'wincomparator')))) &&
+      //   setCrawlDataExist(true);
     }
 
     // console.log('zeroCounter', zeroCounter);
@@ -328,7 +586,7 @@ function App() {
   };
 
   const countByPropTeams = (arr, prop) => {
-    console.log('arrLocal222', arr);
+    
     let obj1 = {};
 
     // const hasAcca = arr.some(elem => elem.isAcca);
@@ -339,17 +597,116 @@ function App() {
       {}
     );
 
-    Object.keys(obj).forEach((key) => {
-      obj1[key] = {
-        count: obj[key],
-        hasAcca: arr.some((elem) => elem.homeTeam === key && elem.isAcca),
-      };
-    });
+    
+      
+    if (arr.every((elem) => elem.action.includes('btts'))) {
+      Object.keys(obj).forEach((key) => {
+        let fff = arr.filter((elem) => elem.homeTeam === key &&  elem.awayTeam && elem.awayTeam !== '')[0];
+        obj1[key] = {
+          homeTeam: key,
+          awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+          count: obj[key],
+          // hasAcca: arr.some((elem) => elem.homeTeam === key && elem.isAcca),
+          numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+          bttsYesNum: arr.filter((elem) => elem.homeTeam === key && !elem.action.includes('btts no')).length,
+          bttsNoNum: arr.filter((elem) => elem.homeTeam === key && elem.action.includes('btts no')).length,
+          resultScore: '',
+          bttsYes: null
+        };
+      });
+    } else if (arr.some((elem) => elem.action.includes('xwin'))) {
+      Object.keys(obj).forEach((key) => {
 
-    console.log('obj1', obj1);
+        let elems = arr.filter(elem => elem.homeTeam === key);
+        // console.log('elems', elems);
+
+        let homeWinArr = elems.filter(elem => elem.homeTeam === elem.prediction);
+        // console.log('homeWinArr', homeWinArr);
+
+        let awayWinArr = elems.filter(elem => elem.awayTeam === elem.prediction);
+        // console.log('awayWinArr', awayWinArr);
+
+        homeWinArr.length !==0 && homeWinArr.forEach(elem => {
+          obj1[`${key}`] = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem && elem.hasOwnProperty('awayTeam') && elem.awayTeam,
+            prediction: elem && elem.hasOwnProperty('prediction') && elem.prediction,
+            count: homeWinArr.length,
+            numAcca: homeWinArr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+            winNum: homeWinArr.filter((elem) => elem.homeTeam === key && (elem.action === 'win' || elem.action.includes('win ') || elem.action.includes('2win') || elem.action.includes('win 1') || elem.action.includes('win 2'))).length,
+            xwinNum: homeWinArr.filter((elem) => elem.homeTeam === key && elem.action.includes('xwin')).length,
+            resultScore: '',
+            winYes: null
+          };
+        })
+        awayWinArr.length !==0 && awayWinArr.forEach(elem => {
+          obj1[`${key} 2`] = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem && elem.hasOwnProperty('awayTeam') && elem.awayTeam,
+            prediction: elem && elem.hasOwnProperty('prediction') && elem.prediction,
+            count: awayWinArr.length,
+            numAcca: awayWinArr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+            winNum: awayWinArr.filter((elem) => elem.homeTeam === key && (elem.action === 'win' || elem.action.includes('win ') || elem.action.includes('2win') || elem.action.includes('win 1') || elem.action.includes('win 2'))).length,
+            xwinNum: awayWinArr.filter((elem) => elem.homeTeam === key && elem.action.includes('xwin')).length,
+            resultScore: '',
+            winYes: null
+          };
+        })
+
+
+      // let fff = arr.filter((elem) => elem.homeTeam === key &&  elem.awayTeam && elem.awayTeam !== '')[0];
+      // let ddd = arr.filter((elem) => elem.homeTeam === key &&  elem.prediction && elem.prediction !== '')[0];
+
+      //   if (ddd && ddd.hasOwnProperty('prediction') && ddd.prediction === key) {
+      //     obj1[key] = {
+      //       homeTeam: key,
+      //       awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+      //       prediction: ddd && ddd.hasOwnProperty('prediction') && ddd.prediction,
+      //       count: obj[key],
+      //       numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+      //       winNum: arr.filter((elem) => elem.homeTeam === key && (elem.action === 'win' || elem.action.includes('win ') || elem.action.includes('2win') || elem.action.includes('win 1') || elem.action.includes('win 2'))).length,
+      //       xwinNum: arr.filter((elem) => elem.homeTeam === key && elem.action.includes('xwin')).length,
+      //       resultScore: '',
+      //       winYes: null
+      //     };
+      //   }
+
+        
+      });
+    } else {
+      Object.keys(obj).forEach((key) => {
+        let fff = arr.filter((elem) => elem.homeTeam === key &&  elem.awayTeam && elem.awayTeam !== '')[0];
+        let action = '';
+
+        if (arr.length !==0) {
+          if (arr[0].action.includes('under25')) {
+            action = 'under25';
+          } else if (arr[0].action.includes('over25')) {
+            action = 'over25';
+          } else if (arr[0].action.includes('draws')) {
+            action = 'draws';
+          }
+        }
+
+        obj1[key] = {
+          homeTeam: key,
+          awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+          count: obj[key],
+          // hasAcca: arr.some((elem) => elem.homeTeam === key && elem.isAcca),
+          numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+          action: action,
+          resultScore: ''
+        };
+      });
+    }
+
+    
+
+    // console.log('obj1', obj1);
 
     return obj1;
   };
+
   const countByProp = (arr, prop) => {
     return arr.reduce(
       (prev, curr) => ((prev[curr[prop]] = ++prev[curr[prop]] || 1), prev),
@@ -371,31 +728,227 @@ function App() {
 
     //GET BTTS
     let bttsDataMongo = await getBtts(todayDate);
+
     bttsDataMongo = bttsDataMongo.map((elem) => {
       let obj = { ...elem };
-      obj.homeTeam = getHomeTeamName(elem.homeTeam);
+      let homeTeam = elem.homeTeam
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+      .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+
+      let awayTeam =
+        elem.awayTeam &&
+        elem.awayTeam !== '' &&
+        elem.awayTeam
+        .replace('SSC ', '')
+        .replace('SC ', '')
+        .replace('SG ', '')
+        .replace('CD ', '')
+        .replace(' IS', '')
+        .replace('1. ', '')
+        .replace('FC ', '')
+        .replace('FK ', '')
+        .replace(' IF', '')
+        .replace(' Utd', ' United')
+        .replace('AC ', '')
+        .replace('AS ', '')
+        .replace(' FF', '')
+        .replace(' FC', '')
+        .replace(' CF', '')
+        .trim();
+      obj.homeTeam = getHomeTeamName(homeTeam);
+      obj.awayTeam = getHomeTeamName(awayTeam);
       return obj;
     });
     console.log('bttsDataMongo444', bttsDataMongo);
-    bttsLocal.length !== 0 && setBttsLocal([]);
     setBttsLocal(bttsDataMongo);
+
+
+    const bttsDataOnly = bttsDataMongo.filter((elem) =>
+      elem.action.includes('btts')
+    );
+    const overDataOnly = bttsDataMongo.filter(
+      (elem) => elem.action === 'over25'
+    );
+
+    bttsLocal.length !== 0 && setBttsOnlyLocal([]);
+    overLocal.length !== 0 && setOverLocal([]);
+    setBttsOnlyLocal(bttsDataOnly);
+    setOverLocal(overDataOnly);
+
+    
 
     //GET WIN
     let winDataMongo = await getWinData(todayDate);
     winDataMongo = winDataMongo.map((elem) => {
       let obj = { ...elem };
-      obj.homeTeam = getHomeTeamName(elem.homeTeam);
-      obj.prediction = getHomeTeamName(elem.prediction);
+      let homeTeam = elem.homeTeam
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+        .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+      let awayTeam =
+        elem.awayTeam &&
+        elem.awayTeam !== '' &&
+        elem.awayTeam
+        .replace('SSC ', '')
+        .replace('SC ', '')
+        .replace('SG ', '')
+        .replace('CD ', '')
+        .replace(' IS', '')
+        .replace('1. ', '')
+        .replace('FC ', '')
+        .replace('FK ', '')
+        .replace(' IF', '')
+        .replace(' Utd', ' United')
+        .replace('AC ', '')
+        .replace('AS ', '')
+        .replace(' FF', '')
+        .replace(' FC', '')
+        .replace(' CF', '')
+        .trim();
+      let pred = elem.prediction
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+        .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+      obj.homeTeam = getHomeTeamName(homeTeam);
+      obj.awayTeam = getHomeTeamName(awayTeam);
+      obj.prediction = getHomeTeamName(pred);
       return obj;
     });
     winDataLocal.length !== 0 && setWinDataLocal([]);
     setWinDataLocal(winDataMongo);
 
+    //GET DRAW
+    let drawDataMongo = await getDraw(todayDate);
+    drawDataMongo = drawDataMongo.map((elem) => {
+      let obj = { ...elem };
+      let homeTeam = elem.homeTeam
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+        .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+      let awayTeam =
+        elem.awayTeam &&
+        elem.awayTeam !== '' &&
+        elem.awayTeam
+        .replace('SSC ', '')
+        .replace('SC ', '')
+        .replace('SG ', '')
+        .replace('CD ', '')
+        .replace(' IS', '')
+        .replace('1. ', '')
+        .replace('FC ', '')
+        .replace('FK ', '')
+        .replace(' IF', '')
+        .replace(' Utd', ' United')
+        .replace('AC ', '')
+        .replace('AS ', '')
+        .replace(' FF', '')
+        .replace(' FC', '')
+        .replace(' CF', '')
+        .trim();
+      obj.homeTeam = getHomeTeamName(homeTeam);
+      obj.awayTeam = getHomeTeamName(awayTeam);
+      return obj;
+    });
+    console.log('drawDataMongo222', drawDataMongo);
+    drawDataLocal.length !== 0 && setDrawDataLocal([]);
+    setDrawDataLocal(drawDataMongo);
+
     //GET UNDER
     let under25DataMongo = await getUnder(todayDate);
     under25DataMongo = under25DataMongo.map((elem) => {
       let obj = { ...elem };
-      obj.homeTeam = getHomeTeamName(elem.homeTeam);
+      let homeTeam = elem.homeTeam
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+        .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+      let awayTeam =
+        elem.awayTeam &&
+        elem.awayTeam !== '' &&
+        elem.awayTeam
+        .replace('SSC ', '')
+        .replace('SC ', '')
+        .replace('SG ', '')
+        .replace('CD ', '')
+        .replace(' IS', '')
+        .replace('1. ', '')
+        .replace('FC ', '')
+        .replace('FK ', '')
+        .replace(' IF', '')
+        .replace(' Utd', ' United')
+        .replace('AC ', '')
+        .replace('AS ', '')
+        .replace(' FF', '')
+        .replace(' FC', '')
+        .replace(' CF', '')
+        .trim();
+      obj.homeTeam = getHomeTeamName(homeTeam);
+      obj.awayTeam = getHomeTeamName(awayTeam);
       return obj;
     });
     let sortedUnder25 = sortData(under25DataMongo);
@@ -404,16 +957,58 @@ function App() {
 
     //GET RESULT AND TOTAL
     const resultsTotalData = await getResultTotal(todayDate);
-    const resultsData = await getResult(todayDate);
 
+    //GET RESULT
+    let resultsData = await getResult(todayDate);
+    resultsData = resultsData.map((elem) => {
+      let obj = { ...elem };
+      let homeTeam = elem.homeTeam
+      .replace('SSC ', '')
+        .replace('SC ', '')
+        .replace('SG ', '')
+        .replace('CD ', '')
+        .replace(' IS', '')
+        .replace('1. ', '')
+        .replace('FC ', '')
+        .replace('FK ', '')
+        .replace(' IF', '')
+        .replace(' Utd', ' United')
+        .replace('AC ', '')
+        .replace('AS ', '')
+        .replace(' FF', '')
+        .replace(' FC', '')
+        .replace(' CF', '')
+        .trim();
+      let awayTeam = elem.awayTeam
+      .replace('SSC ', '')
+      .replace('SC ', '')
+      .replace('SG ', '')
+      .replace('CD ', '')
+        .replace(' IS', '')
+      .replace('1. ', '')
+      .replace('FC ', '')
+      .replace('FK ', '')
+      .replace(' IF', '')
+      .replace(' Utd', ' United')
+      .replace('AC ', '')
+      .replace('AS ', '')
+      .replace(' FF', '')
+      .replace(' FC', '')
+      .replace(' CF', '')
+      .trim();
+      obj.homeTeam = getHomeTeamName(homeTeam);
+      obj.awayTeam = getHomeTeamName(awayTeam);
+      return obj;
+    });
+    console.log('resultsData444', resultsData);
     resultsLocal.length !== 0 && setResultsLocal([]);
     setResultsLocal(resultsData);
+
     setAllRes(resultsData);
     setResultsTotalLocal(resultsTotalData);
     setResultsTotalLocalFil(resultsTotalData);
 
-    let countedObjBtts =
-      bttsDataMongo.length !== 0 && countByProp(bttsDataMongo, 'source');
+    
 
     //   console.log('countedObjBtts',countedObjBtts);
 
@@ -429,13 +1024,93 @@ function App() {
     //     return {...countedObjBtts, ...obj}
     //   }
     // })
-    const countedHomeTeamBtts =
+
+
+    //PRODUCTION OBJECTS
+    console.log('bttsDataOnly444', bttsDataOnly);
+    console.log('winDataLocal444', winDataLocal.length !== 0 && winDataLocal);
+    
+
+    let productionBtts =
+      bttsDataOnly.length !== 0 && countByPropTeams(bttsDataOnly, 'homeTeam');
+    let productionOver =
+      bttsDataOnly.length !== 0 && countByPropTeams(overDataOnly, 'homeTeam');
+    let productionWin =
+    winDataLocal.length !== 0 && countByPropTeams(winDataLocal, 'homeTeam');
+    let productionUnder =
+    under25DataLocal.length !== 0 && countByPropTeams(under25DataLocal, 'homeTeam');
+    let productionDraw =
+    drawDataLocal.length !== 0 && countByPropTeams(drawDataLocal.length !== 0 && drawDataLocal, 'homeTeam');
+
+    
+
+
+    Object.keys(productionBtts).forEach(elem => {
+      if (productionBtts[elem].count < 2) {
+        delete productionBtts[elem]
+      }
+    })
+    Object.keys(productionOver).forEach(elem => {
+      if (productionOver[elem].count < 2) {
+        delete productionOver[elem]
+      }
+    })
+    Object.keys(productionUnder).forEach(elem => {
+      if (productionUnder[elem].count < 2) {
+        delete productionUnder[elem]
+      }
+    })
+    Object.keys(productionWin).forEach(elem => {
+      if (productionWin[elem].count < 2) {
+        delete productionWin[elem]
+      }
+    })
+    Object.keys(productionDraw).forEach(elem => {
+      if (productionDraw[elem].count < 2) {
+        delete productionDraw[elem]
+      }
+    })
+
+    console.log('productionBtts444', productionBtts);
+    productionBtts = Object.values(productionBtts);
+    productionBtts.length !== 0 && setProductionBtts(productionBtts);
+    console.log('productionBtts555', productionBtts);
+
+    console.log('productionOver444', productionOver);
+    productionOver = Object.values(productionOver);
+    productionOver.length !== 0 && setProductionOver(productionOver);
+    console.log('productionOver555', productionOver);
+
+    console.log('productionUnder444', productionUnder);
+    productionUnder = Object.values(productionUnder);
+    productionUnder.length !== 0 && setProductionUnder(productionUnder);
+    console.log('productionUnder555', productionUnder);
+
+    console.log('productionWin444', productionWin);
+    productionWin = Object.values(productionWin);
+    productionWin.length !== 0 && setProductionWin(productionWin);
+    console.log('productionWin555', productionWin);
+
+    console.log('productionDraw444', productionDraw);
+    productionDraw = Object.values(productionDraw);
+    productionDraw.length !== 0 && setProductionDraw(productionDraw);
+    console.log('productionDraw555', productionDraw);
+
+
+
+    //ADM AND MONITOR
+
+    let countedObjBtts =
+      bttsDataMongo.length !== 0 && countByProp(bttsDataMongo, 'source');
+
+    let countedHomeTeamAdmBtts =
       bttsDataMongo.length !== 0 && countByPropTeams(bttsDataMongo, 'homeTeam');
 
-    console.log('countedObjBtts', countedObjBtts);
 
     countedObjBtts && setBttsSourcesCount(countedObjBtts);
-    countedHomeTeamBtts && setBttsHomeTeamCount(countedHomeTeamBtts);
+    countedHomeTeamAdmBtts && setBttsHomeTeamCount(countedHomeTeamAdmBtts);
+
+    // console.log('countedHomeTeamBtts', countedHomeTeamBtts);
 
     const countedObjWin =
       winDataMongo.length !== 0 && countByProp(winDataMongo, 'source');
@@ -443,6 +1118,13 @@ function App() {
       winDataMongo.length !== 0 && countByPropTeams(winDataMongo, 'homeTeam');
     countedObjWin && setWinSourcesCount(countedObjWin);
     countedPredTeam && setWinPredTeamCount(countedPredTeam);
+
+    const countedObjDraw =
+      drawDataMongo.length !== 0 && countByProp(drawDataMongo, 'source');
+    const countedTeamDraw =
+      drawDataMongo.length !== 0 && countByPropTeams(drawDataMongo, 'homeTeam');
+    countedObjDraw && setDrawSourcesCount(countedObjDraw);
+    countedTeamDraw && setTeamDrawCount(countedTeamDraw);
 
     const countedObjUnder =
       under25DataMongo.length !== 0 && countByProp(under25DataMongo, 'source');
@@ -563,18 +1245,22 @@ function App() {
   };
   const handleZeroResSubmit = async (e) => {
     e.preventDefault();
-    // console.log('zeroCounter', zeroCounter);
-    await calcTotal();
+    console.log('zeroCounter333', zeroCounter);
+    // await calcTotal();
     const res = await saveZeroCounter(zeroCounter);
-    res === 'new zero counter inserted' && alert('zero counter saved');
+    res === 'zero counter inserted' && alert('zero counter saved');
   };
   const handleSaveMatches = async (e, title) => {
     e.preventDefault();
-    console.log('e.target.value', matchesO25Tip);
+    // console.log('e.target.value', matchesO25Tip);
     switch (title) {
-      case 'o25tip':
-        pushMatches(matchesO25Tip, title);
-        setMatchesO25Tip('');
+      case 'o25tip_win':
+        pushMatches(matchesO25Tip_win, title);
+        setMatchesO25Tip_win('');
+        break;
+      case 'o25tip_high':
+        pushMatches(matchesO25Tip_high, title);
+        setMatchesO25Tip_high('');
         break;
       case 'bettingtips_o25':
         pushMatches(matchesBettingtips_o25, title);
@@ -700,6 +1386,26 @@ function App() {
         pushMatches(matchesBettingtips_win, title);
         setMatchesBettingtips_win('');
         break;
+      // case 'morph_o25':
+      //   pushMatches(matchesMorph_o25, title);
+      //   setMatchesMorph_o25('');
+      //   break;
+      // case 'kcpredict_o25':
+      //   pushMatches(matchesKcpredict_o25, title);
+      //   setMatchesMorph_o25('');
+      //   break;
+      // case 'kcpredict_btts':
+      //   pushMatches(matchesKcpredict_btts, title);
+      //   setMatchesMorph_o25('');
+      //   break;
+      // case 'trustpredict_btts':
+      //   pushMatches(matchesTrustpredict_btts, title);
+      //   setMatchesTrustpredict_btts('');
+      //   break;
+      // case 'trustpredict_o25':
+      //   pushMatches(matchesTrustpredict_o25, title);
+      //   setMatchesTrustpredict_o25('');
+      //   break;
       default:
         console.log(`Sorry, we are out of ${title}.`);
     }
@@ -769,6 +1475,14 @@ function App() {
                 <button class="button" onClick={loadTest}>
                   Load Test
                 </button>
+                {bttsDataExist &&
+                  winDataExist &&
+                  drawDataExist &&
+                  overDataExist && (
+                    <button class="button" onClick={handleLoadWithVpn}>
+                      Load With Vpn
+                    </button>
+                  )}
               </>
             )}
           </form>
@@ -869,6 +1583,25 @@ function App() {
                           </button>
                         )}
                       </div>
+                      <div class="buttons">
+                        {!drawDataExist ? (
+                          <button
+                            class="button"
+                            onClick={() => handleLoadDraw()}
+                            type="button"
+                          >
+                            load draw
+                          </button>
+                        ) : (
+                          <button
+                            class="button active"
+                            onClick={() => handleDeleteDraw()}
+                            type="button"
+                          >
+                            delete draw
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 {todayDate &&
@@ -878,7 +1611,7 @@ function App() {
                         <button
                           class="button"
                           type="button"
-                          onClick={() => handleLoadResult()}
+                          onClick={() => Prodult()}
                         >
                           load result
                         </button>
@@ -927,8 +1660,10 @@ function App() {
           <Tab label="Results" {...a11yProps(2)} />
           <Tab label="Under 25" {...a11yProps(3)} />
           <Tab label="Win Preds" {...a11yProps(4)} />
-          <Tab label="Zero Counter" {...a11yProps(5)} />
-          {/* <Tab label="ACCAS" {...a11yProps(5)} /> */}
+          <Tab label="Draws" {...a11yProps(5)} />
+          <Tab label="Zeros" {...a11yProps(6)} />
+          <Tab label="Load Monitor" {...a11yProps(7)} />
+          <Tab label="Prod" {...a11yProps(8)} />
           {/*<Tab label="Item Four" {...a11yProps(3)} />
           <Tab label="Item Five" {...a11yProps(4)} />
           <Tab label="Item Six" {...a11yProps(5)} />
@@ -984,15 +1719,19 @@ function App() {
               value={sourceTotalPred}
               onChange={(e) => setSourceTotalPred(e.target.value)}
             >
-              <option value="accum">accum</option>
-              <option value="wdw">wdw</option>
+              <option value="accum_btts">accum_btts</option>
+              <option value="accum_o25">accum_o25</option>
+              <option value="wdw_btts">wdw_btts</option>
+              <option value="wdw_o25">wdw_o25</option>
               <option value="fst">fst</option>
               <option value="footsuper">footsuper</option>
               <option value="redscores">redscores</option>
-              <option value="bettingtips">bettingtips</option>
+              <option value="fbp">fbp</option>
               <option value="betshoot">betshoot</option>
+              <option value="betclan_btts">betclan_btts</option>
+              <option value="betclan_o25">betclan_o25</option>
               <option value="o25tip_acc">o25tip_acc</option>
-              <option value="mines_acc">mines_acc</option>
+              <option value="mines_acc_o25">mines_acc_o25</option>
               <option value="prot">prot</option>
             </select>
             <div className="radio-btn-container">
@@ -1047,19 +1786,6 @@ function App() {
               Include WL
             </button> */}
         </div>
-        <ul className="sourcesAggs">
-          {Object.keys(bttsSourcesCount).length !== 0 &&
-            Object.keys(bttsSourcesCount).map((source, i) => {
-              return (
-                <li key={i} className="sourcesAggsElem">
-                  <div style={{ fontWeight: '700', marginRight: '10px' }}>
-                    {source}
-                  </div>
-                  <div>{bttsSourcesCount[source]}</div>
-                </li>
-              );
-            })}
-        </ul>
 
         <div className="wrap-collabsible">
           <input id="collapsible" className="toggle" type="checkbox"></input>
@@ -1104,7 +1830,7 @@ function App() {
                                   cursor: 'pointer',
                                   fontWeight: '700',
                                   marginRight: '10px',
-                                  outline: bttsHomeTeamCount[homeTeam].hasAcca
+                                  outline: bttsHomeTeamCount[homeTeam].numAcca > 0
                                     ? '2px dashed green'
                                     : 'none',
                                 }}
@@ -1220,6 +1946,42 @@ function App() {
                             : 'transparent',
                         fontWeight: elem.isAcca ? '700' : '400',
                         border: elem.isAcca ? '4px dashed green' : 'none',
+                        opacity:
+                          elem.source === 'accum_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'accum_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'banker_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'banker_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'mighty_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'r2bet_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'r2bet_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'bettingtips'
+                            ? '0.3'
+                            : '1' && elem.source === 'o25tip'
+                            ? '0.3'
+                            : '1' && elem.source === 'footy_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'footy_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'trustpredict_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'trustpredict_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'kcpredict_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'kcpredict_o25'
+                            ? '0.3'
+                            : '1' && elem.source === 'venas_btts'
+                            ? '0.3'
+                            : '1' && elem.source === 'venas_o25'
+                            ? '0.3'
+                            : '1',
                         // (elem.source.includes('fst')) ||
                         // (elem.source === 'o25tip') ||
                         // (elem.source === 'footsuper_o25' && elem.action === 'over25') ||
@@ -1536,7 +2298,7 @@ function App() {
         {/* <h2>{`Count: (${under25DataLocal.length})`}</h2> */}
 
         <h2>{`Prediction type: Under45 (${under25DataLocal.length})`}</h2>
-        <ul className="sourcesAggs">
+        {/* <ul className="sourcesAggs">
           {Object.keys(underSourcesCount).length !== 0 &&
             Object.keys(underSourcesCount).map((source, i) => {
               return (
@@ -1548,7 +2310,7 @@ function App() {
                 </li>
               );
             })}
-        </ul>
+        </ul> */}
 
         <div style={{ width: '100%', display: 'flex', marginBottom: '20px' }}>
           {/* <button
@@ -1683,7 +2445,7 @@ function App() {
                                   cursor: 'pointer',
                                   fontWeight: '700',
                                   marginRight: '10px',
-                                  outline: underHomeTeamCount[homeTeam].hasAcca
+                                  outline: underHomeTeamCount[homeTeam].numAcca > 0
                                     ? '2px dashed green'
                                     : 'none',
                                 }}
@@ -1762,7 +2524,7 @@ function App() {
       </TabPanel>
       <TabPanel value={value} index={4}>
         <h2>{`Prediction Type: Win (${winDataLocal.length})`}</h2>
-        <ul className="sourcesAggs">
+        {/* <ul className="sourcesAggs">
           {Object.keys(winSourcesCount).length !== 0 &&
             Object.keys(winSourcesCount).map((source, i) => {
               return (
@@ -1774,7 +2536,7 @@ function App() {
                 </li>
               );
             })}
-        </ul>
+        </ul> */}
         <form
           onSubmit={handleWinPredSubmit}
           style={{
@@ -1874,7 +2636,7 @@ function App() {
                                   cursor: 'pointer',
                                   fontWeight: '700',
                                   marginRight: '10px',
-                                  outline: winPredTeamCount[homeTeam].hasAcca
+                                  outline: winPredTeamCount[homeTeam].numAcca > 0
                                     ? '2px dashed green'
                                     : 'none',
                                 }}
@@ -2017,7 +2779,185 @@ function App() {
         )}
       </TabPanel>
       <TabPanel value={value} index={5}>
-        <h2>{`Zero Since 6 sept 2023 (${winDataLocal.length})`}</h2>
+        <h2>{`Prediction Type: Draw (${drawDataLocal.length})`}</h2>
+        {/* <ul className="sourcesAggs">
+          {Object.keys(drawSourcesCount).length !== 0 &&
+            Object.keys(drawSourcesCount).map((source, i) => {
+              return (
+                <li key={i} className="sourcesAggsElem">
+                  <div style={{ fontWeight: '700', marginRight: '10px' }}>
+                    {source}
+                  </div>
+                  <div>{drawSourcesCount[source]}</div>
+                </li>
+              );
+            })}
+        </ul> */}
+
+        <div className="wrap-collabsible">
+          <input id="collapsible5" className="toggle" type="checkbox"></input>
+          <label for="collapsible5" className="lbl-toggle">
+            Show Aggs
+          </label>
+          <div className="collapsible-content">
+            <div className="content-inner">
+              <ul
+                style={{
+                  listStyle: 'none',
+                  marginBottom: '20px',
+                  width: '100%',
+                }}
+              >
+                {Object.keys(teamDrawCount).length !== 0 &&
+                  Object.keys(teamDrawCount).map((homeTeam, i) => {
+                    return (
+                      <li
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          width: '50%',
+                        }}
+                      >
+                        {teamDrawCount[homeTeam].count > 1 && (
+                          <div
+                            style={{
+                              display: 'flex',
+                              width: '100%',
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                width: '50%',
+                              }}
+                            >
+                              <div
+                                // onClick={() => handleTeamAggClick(homeTeam)}
+                                style={{
+                                  cursor: 'pointer',
+                                  fontWeight: '700',
+                                  marginRight: '10px',
+                                  outline: teamDrawCount[homeTeam].numAcca > 0
+                                    ? '2px dashed green'
+                                    : 'none',
+                                }}
+                              >
+                                {homeTeam}
+                              </div>
+                              <div>{teamDrawCount[homeTeam].count}</div>
+                            </div>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {drawDataLocal.length !== 0 && (
+          <table className="table">
+            <th className="cell width20">Home Team</th>
+            <th className="cell width20">Away Team</th>
+            <th className="cell width20">Source</th>
+            <th className="cell width20">Action</th>
+            {/* <th className="cell width10">Score</th> */}
+            {/* <th className="cell width10">Source</th>
+            <th className="cell width10">btts res</th>
+            <th className="cell width10">over 05 res</th>
+            <th className="cell width10">over 15 res</th>
+            <th className="cell width10">over 25 res</th> */}
+            <tbody>
+              {drawDataLocal
+                .sort((a, b) => {
+                  if (a.homeTeam < b.homeTeam) {
+                    return -1;
+                  }
+                  if (a.homeTeam > b.homeTeam) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((elem) => {
+                  return (
+                    <tr
+                      key={elem._id}
+                      style={{
+                        backgroundColor:
+                          elem.source === 'gnowAcc'
+                            ? 'lightgray'
+                            : 'transparent' && elem.source === 'footy'
+                            ? '#CCF5AC'
+                            : 'transparent' && elem.source === 'accum'
+                            ? '#5BC0BE'
+                            : 'transparent' && elem.source === 'r2bet'
+                            ? '#F9F5E3'
+                            : 'transparent' && elem.source === 'venas'
+                            ? '#A95E4C'
+                            : 'transparent' && elem.source === 'passion'
+                            ? '#E1BC29'
+                            : 'transparent' && elem.source === 'fbp'
+                            ? '#A095C6'
+                            : 'transparent' && elem.source === 'prot'
+                            ? '#a2d2ff'
+                            : 'transparent' && elem.source === 'hello'
+                            ? '#fee440'
+                            : 'transparent' && elem.source === 'morph'
+                            ? '#006EAF'
+                            : 'transparent' && elem.source === 'mybets'
+                            ? 'lightblue'
+                            : 'transparent' && elem.source === 'mines'
+                            ? 'green'
+                            : 'transparent' && elem.source === 'betshoot'
+                            ? '#fdf0d5'
+                            : 'transparent' && elem.source === 'bettingtips'
+                            ? '#ffd8be'
+                            : 'transparent' && elem.source === 'banker'
+                            ? '#007ea7'
+                            : 'transparent' && elem.source === 'wincomparator'
+                            ? '#70a288'
+                            : 'transparent' && elem.source === 'vitibet'
+                            ? '#FFB6D9'
+                            : 'transparent' && elem.source === 'betgenuine'
+                            ? '#E19898'
+                            : 'transparent' && elem.source === 'footsuper_o25'
+                            ? '#CECE5A'
+                            : 'transparent' && elem.source === 'soccertipz'
+                            ? '#70a288'
+                            : 'transparent' && elem.source === 'wdw'
+                            ? '#fb5607'
+                            : 'transparent',
+                      }}
+                    >
+                      <td className="cell width20">{elem.homeTeam}</td>
+                      <td className="cell width20">{elem.awayTeam}</td>
+                      <td className="cell width20">{elem.source}</td>
+                      <td className="cell width20">{elem.action}</td>
+                      {/* <td className="cell width20">{elem.predictionDate}</td> */}
+
+                      {/* <td className="cell width10">{elem.source}</td>
+                      <td className="cell width10">
+                        {elem.bttsRes ? 'True' : 'False'}
+                      </td>
+                      <td className="cell width10">
+                        {elem.over05Res ? 'True' : 'False'}
+                      </td>
+                      <td className="cell width10">
+                        {elem.over15Res ? 'True' : 'False'}
+                      </td>
+                      <td className="cell width10">
+                        {elem.over25Res ? 'True' : 'False'}
+                      </td> */}
+                      {/* <td className="cellResult">{elem.prediction}</td> */}
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+      </TabPanel>
+      <TabPanel value={value} index={6}>
+        {/* <h2>{`Zero Since 6 sept 2023 (${winDataLocal.length})`}</h2> */}
 
         <form
           onSubmit={handleZeroResSubmit}
@@ -2031,7 +2971,7 @@ function App() {
           <Counter
             title="o25tip_win"
             increment={increment}
-            setMatches={setMatchesO25Tip}
+            setMatches={setMatchesO25Tip_win}
             saveMatches={handleSaveMatches}
           />
           <Counter
@@ -2225,6 +3165,457 @@ function App() {
             Send to mongo
           </button>
         </form>
+      </TabPanel>
+      <TabPanel value={value} index={7}>
+        <>
+          {bttsLocal.lenght !== 0 && (
+            <div>
+              <h4>BTTS</h4>
+              <ul className="sourcesAggs">
+                {Object.keys(bttsSources).length !== 0 &&
+                  Object.keys(bttsSources).map((source, i) => {
+                    if (bttsSourcesCount[source]) {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{ fontWeight: '700', marginRight: '10px' }}
+                          >
+                            {source}
+                          </div>
+                          <div>{bttsSourcesCount[source]}</div>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{
+                              fontWeight: '700',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {source}
+                          </div>
+
+                          {/* <div>{bttsSources[source].exist}</div> */}
+                        </li>
+                      );
+                    }
+                  })}
+              </ul>
+            </div>
+          )}
+        </>
+        <>
+          {overLocal.lenght !== 0 && (
+            <div>
+              <h4>Over 25</h4>
+              <ul className="sourcesAggs">
+                {Object.keys(o25Sources).length !== 0 &&
+                  Object.keys(o25Sources).map((source, i) => {
+                    if (bttsSourcesCount[source]) {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{ fontWeight: '700', marginRight: '10px' }}
+                          >
+                            {source}
+                          </div>
+                          <div>{bttsSourcesCount[source]}</div>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{
+                              fontWeight: '700',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {source}
+                          </div>
+
+                          {/* <div>{bttsSources[source].exist}</div> */}
+                        </li>
+                      );
+                    }
+                  })}
+              </ul>
+            </div>
+          )}
+        </>
+        <>
+          {under25DataLocal.lenght !== 0 && (
+            <div>
+              <h4>Under 25</h4>
+              <ul className="sourcesAggs">
+                {Object.keys(u25Sources).length !== 0 &&
+                  Object.keys(u25Sources).map((source, i) => {
+                    if (underSourcesCount[source]) {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{ fontWeight: '700', marginRight: '10px' }}
+                          >
+                            {source}
+                          </div>
+                          <div>{underSourcesCount[source]}</div>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{
+                              fontWeight: '700',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {source}
+                          </div>
+
+                          {/* <div>{bttsSources[source].exist}</div> */}
+                        </li>
+                      );
+                    }
+                  })}
+              </ul>
+            </div>
+          )}
+        </>
+        <>
+          {winDataLocal.lenght !== 0 && (
+            <div>
+              <h4>Win Data</h4>
+              <ul className="sourcesAggs">
+                {Object.keys(winSources).length !== 0 &&
+                  Object.keys(winSources).map((source, i) => {
+                    if (winSourcesCount[source]) {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{ fontWeight: '700', marginRight: '10px' }}
+                          >
+                            {source}
+                          </div>
+                          <div>{winSourcesCount[source]}</div>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{
+                              fontWeight: '700',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {source}
+                          </div>
+
+                          {/* <div>{bttsSources[source].exist}</div> */}
+                        </li>
+                      );
+                    }
+                  })}
+              </ul>
+            </div>
+          )}
+        </>
+        <>
+          {drawDataLocal.lenght !== 0 && (
+            <div>
+              <h4>Draw Data</h4>
+              <ul className="sourcesAggs">
+                {Object.keys(drawSources).length !== 0 &&
+                  Object.keys(drawSources).map((source, i) => {
+                    if (drawSourcesCount[source]) {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{ fontWeight: '700', marginRight: '10px' }}
+                          >
+                            {source}
+                          </div>
+                          <div>{drawSourcesCount[source]}</div>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <li key={i} className="sourcesAggsElem">
+                          <div
+                            style={{
+                              fontWeight: '700',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {source}
+                          </div>
+
+                          {/* <div>{bttsSources[source].exist}</div> */}
+                        </li>
+                      );
+                    }
+                  })}
+              </ul>
+            </div>
+          )}
+        </>
+      </TabPanel>
+      <TabPanel value={value} index={8}>
+        
+      <button
+                  className="button"
+                  type="button"
+                  onClick={() => handleLoadResProd()}
+                >
+                  load res
+                </button>
+        <div>
+          <p>btts</p>
+          <>
+          {productionBttsLocal.length !== 0 && (
+            <Table columns={columnsBttsProd} data={productionBttsLocal} />
+          // <table className="table">
+          //   <tbody>
+          //     {/* <th className="cell width10">Res</th> */}
+          //     <th className="cell width20">Home Team</th>
+          //     {/* <th className="cell width20">Pred Team</th> */}
+          //     <th className="cell width20">Away Team</th>
+          //     <th className="cell width10">Count</th>
+          //     <th className="cell width10">Acc Count</th>
+          //     <th className="cell width10">Btts Yes</th>
+          //     <th className="cell width10">Btts No</th>
+          //     <th className="cell width20">Result</th>
+          //     <th className="cell width20">Btts Yes</th>
+          //     {productionBttsLocal
+          //       .sort((a, b) => {
+          //         if (a.homeTeam < b.homeTeam) {
+          //           return -1;
+          //         }
+          //         if (a.homeTeam > b.homeTeam) {
+          //           return 1;
+          //         }
+          //         return 0;
+          //       })
+          //       .map((elem) => {
+          //         return (
+          //           <tr
+          //             key={elem._id}
+          //           >
+          //             <td className="cell width20">{elem.homeTeam}</td>
+          //             {/* <td className="cell width20">{elem.predTeam}</td> */}
+          //             <td className="cell width20">{elem.awayTeam}</td>
+          //             <td className="cell width10">{elem.count}</td>
+          //             <td className="cell width10">{elem.numAcca}</td>
+          //             <td className="cell width10">
+          //               {elem.bttsYesNum}
+          //             </td>
+          //             <td className="cell width10">
+          //               {elem.bttsNoNum}
+          //             </td>
+          //             <td className="cell width20">{elem.resultScore}</td>
+          //             <td className="cell width20" style={{backgroundColor: elem.bttsYes ? 'yellow'
+          //                   : 'black' }}></td>
+          //           </tr>
+          //         );
+          //       })}
+          //   </tbody>
+          // </table>
+        )}
+          </>
+        </div>
+        <div>
+          <p>over</p>
+          <>
+          {productionOverLocal.length !== 0 && (
+          <table className="table">
+            <tbody>
+              {/* <th className="cell width10">Res</th> */}
+              <th className="cell width20">Home Team</th>
+              {/* <th className="cell width20">Pred Team</th> */}
+              <th className="cell width20">Away Team</th>
+              <th className="cell width20">Count</th>
+              <th className="cell width20">Acc Count</th>
+              <th className="cell width20">Result</th>
+              <th className="cell width20">Over Yes</th>
+              {productionOverLocal
+                .sort((a, b) => {
+                  if (a.homeTeam < b.homeTeam) {
+                    return -1;
+                  }
+                  if (a.homeTeam > b.homeTeam) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((elem) => {
+                  return (
+                    <tr
+                      key={elem._id}
+                    >
+                      <td className="cell width20">{elem.homeTeam}</td>
+                      {/* <td className="cell width20">{elem.predTeam}</td> */}
+                      <td className="cell width20">{elem.awayTeam}</td>
+                      <td className="cell width20">{elem.count}</td>
+                      <td className="cell width20">{elem.numAcca}</td>
+                      <td className="cell width20">{elem.resultScore}</td>
+                      <td className="cell width20" style={{backgroundColor: elem.overYes ? 'yellow'
+                            : 'black' }}></td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+          </>
+        </div>
+        <div>
+          <p>under</p>
+          <>
+          {productionUnderLocal.length !== 0 && (
+          <table className="table">
+            <tbody>
+              {/* <th className="cell width10">Res</th> */}
+              <th className="cell width20">Home Team</th>
+              {/* <th className="cell width20">Pred Team</th> */}
+              <th className="cell width20">Away Team</th>
+              <th className="cell width20">Count</th>
+              <th className="cell width20">Acc Count</th>
+              <th className="cell width20">Result</th>
+              <th className="cell width20">Under Yes</th>
+              {productionUnderLocal
+                .sort((a, b) => {
+                  if (a.homeTeam < b.homeTeam) {
+                    return -1;
+                  }
+                  if (a.homeTeam > b.homeTeam) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((elem) => {
+                  return (
+                    <tr
+                      key={elem._id}
+                    >
+                      <td className="cell width20">{elem.homeTeam}</td>
+                      {/* <td className="cell width20">{elem.predTeam}</td> */}
+                      <td className="cell width20">{elem.awayTeam}</td>
+                      <td className="cell width20">{elem.count}</td>
+                      <td className="cell width20">{elem.numAcca}</td>
+                      <td className="cell width20">{elem.resultScore}</td>
+                      <td className="cell width20" style={{backgroundColor: elem.underYes ? 'yellow': 'black' }}></td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+          </>
+        </div>
+        <div>
+          <p>win</p>
+          <>
+          {productionWinLocal.length !== 0 && (
+          <table className="table">
+            <tbody>
+              {/* <th className="cell width10">Res</th> */}
+              <th className="cell width15">Home Team</th>
+              {/* <th className="cell width15">Pred Team</th> */}
+              <th className="cell width15">Away Team</th>
+              <th className="cell width15">Prediction</th>
+              <th className="cell width10">Count</th>
+              <th className="cell width10">Acc Count</th>
+              <th className="cell width10">Win Count</th>
+              <th className="cell width10">Xwin Count</th>
+              <th className="cell width10">Result</th>
+              <th className="cell width10">WinYes</th>
+              {productionWinLocal
+                .sort((a, b) => {
+                  if (a.homeTeam < b.homeTeam) {
+                    return -1;
+                  }
+                  if (a.homeTeam > b.homeTeam) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((elem) => {
+                  return (
+                    <tr
+                      key={elem._id}
+                    >
+                      <td className="cell width15">{elem.homeTeam}</td>
+                      {/* <td className="cell width15">{elem.predTeam}</td> */}
+                      <td className="cell width15">{elem.awayTeam}</td>
+                      <td className="cell width15">{elem.prediction}</td>
+                      <td className="cell width10">{elem.count}</td>
+                      <td className="cell width10">{elem.numAcca}</td>
+                      <td className="cell width10">{elem.winNum}</td>
+                      <td className="cell width10">{elem.xwinNum}</td>
+                      <td className="cell width10">{elem.resultScore}</td>
+                      <td className="cell width10" style={{backgroundColor: elem.winYes ? 'yellow'
+                            : 'black' }}></td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+          </>
+        </div>
+        <div>
+          <p>draw</p>
+          <>
+          {productionDrawLocal.length !== 0 && (
+          <table className="table">
+            <tbody>
+              {/* <th className="cell width10">Res</th> */}
+              <th className="cell width15">Home Team</th>
+              {/* <th className="cell width15">Pred Team</th> */}
+              <th className="cell width15">Away Team</th>
+              <th className="cell width10">Count</th>
+              <th className="cell width10">Acc Count</th>
+              <th className="cell width10">Result</th>
+              <th className="cell width10">Draw Yes</th>
+              {productionDrawLocal
+                .sort((a, b) => {
+                  if (a.homeTeam < b.homeTeam) {
+                    return -1;
+                  }
+                  if (a.homeTeam > b.homeTeam) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((elem) => {
+                  return (
+                    <tr
+                      key={elem._id}
+                    >
+                      <td className="cell width15">{elem.homeTeam}</td>
+                      {/* <td className="cell width15">{elem.predTeam}</td> */}
+                      <td className="cell width15">{elem.awayTeam}</td>
+                      <td className="cell width10">{elem.count}</td>
+                      <td className="cell width10">{elem.numAcca}</td>
+                      <td className="cell width10">{elem.resultScore}</td>
+                      <td className="cell width10" style={{backgroundColor: elem.drawYes ? 'yellow'
+                            : 'black' }}>{elem.drawYes}</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+          </>
+        </div>
       </TabPanel>
       {/* <TabPanel value={value} index={3}>
         Item Four

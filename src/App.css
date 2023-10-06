@@ -132,11 +132,11 @@ input[type='checkbox'] { display: none; }
 .date {
   margin: 1rem 0;
 }
-.table {
+table, .table {
   width: 100%;
   border-collapse: collapse;
 }
-.cell {
+td, .cell {
   border: 1px solid gray;
 }
 .width33 {

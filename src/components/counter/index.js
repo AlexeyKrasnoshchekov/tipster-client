@@ -9,14 +9,14 @@ function Counter({
   setMatches,
   saveMatches,
 }) {
-  const { zeroCounterYesterday, zeroCounter } = useContext(context);
+  const { zeroCounter } = useContext(context);
 
   return (
     <>
-      {zeroCounterYesterday && zeroCounter && zeroCounterYesterday[title] && zeroCounter[title] &&
+      {zeroCounter && zeroCounter[title] &&
         <div className="counter">
           <span class="counter_title">{title}</span>
-          <span class="counter_prev">{`Prev: ${zeroCounterYesterday[title].total}`}</span>
+          {/* <span class="counter_prev">{`Prev: ${zeroCounterYesterday[title].total}`}</span> */}
 
           <span class="counter_today">
             Today zero(s): {zeroCounter[title].total}
