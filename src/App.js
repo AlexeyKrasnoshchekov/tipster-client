@@ -51,10 +51,11 @@ import {
   loadOverData,
   loadOverDataWithVpn,
 } from './api/over';
-import { getHomeTeamName, sortData } from './utils';
+import { getHomeTeamName, getSourcesProd, getSourcesProdInverse, sortData } from './utils';
 import Counter from './components/counter';
 import { deleteDraw, getDraw, loadDraw, loadDrawWithVpn } from './api/draw';
 import Table from './components/table';
+import { getBttsProd, getDrawProd, getOverProd, getUnderProd, getWinProd, saveBttsProd, saveDrawProd, saveOverProd, saveUnderProd, saveWinProd, updateBttsProd, updateDrawProd, updateOverProd, updateUnderProd, updateWinProd } from './api/prod';
 
 function App() {
   const today = new Date();
@@ -84,6 +85,33 @@ function App() {
   // console.log('zeroCounterYesterday', zeroCounterYesterday);
   // console.log('zeroCounter', zeroCounter);
 
+  //today draw total arrs
+  let todayDrawStatArr = [];
+  let todayWinStatArr = [];
+  let todayOverStatArr = [];
+  let todayUnderStatArr = [];
+  let todayBttsStatArr = [];
+
+  let todayDrawStatTotalArr = [];
+  let todayWinStatTotalArr = [];
+  let todayOverStatTotalArr = [];
+  let todayUnderStatTotalArr = [];
+  let todayBttsStatTotalArr = [];
+
+  //stat totals
+    const [todayStatDraw, setTodayStatDraw] = useState([]);
+    const [todayStatBtts, setTodayStatBtts] = useState([]);
+    const [todayStatOver, setTodayStatOver] = useState([]);
+    const [todayStatUnder, setTodayStatUnder] = useState([]);
+    const [todayStatWin, setTodayStatWin] = useState([]);
+
+  //sources totals
+    const [bttsSourcesLength, setBttsSourcesLength] = useState(0);
+    const [overSourcesLength, setOverSourcesLength] = useState(0);
+    const [winSourcesLength, setWinSourcesLength] = useState(0);
+    const [underSourcesLength, setUnderSourcesLength] = useState(0);
+    const [drawSourcesLength, setDrawSourcesLength] = useState(0);
+
   //production arrays
   const [productionBttsLocal, setProductionBtts] = useState([]);
   const [productionOverLocal, setProductionOver] = useState([]);
@@ -93,7 +121,8 @@ function App() {
 
   const [bttsLocal, setBttsLocal] = useState([]);
   const [bttsOnlyLocal, setBttsOnlyLocal] = useState([]);
-  const [overLocal, setOverLocal] = useState([]);
+  const [over25OnlyLocal, setOver25OnlyLocal] = useState([]);
+
   const [allRes, setAllRes] = useState([]);
   // const [bttsWLLocal, setBttsWLLocal] = useState([]);
   // const [isInclude, setIsInclude] = useState(false);
@@ -109,7 +138,9 @@ function App() {
   const [showZero, setShowZero] = useState(false);
   const [addWin, setAddWinToBtts] = useState(false);
   const [bttsSourcesCount, setBttsSourcesCount] = useState({});
+  const [overSourcesCount, setOverSourcesCount] = useState({});
   const [bttsHomeTeamCount, setBttsHomeTeamCount] = useState({});
+  const [bttsAndOverArr, setBttsAndOverArr] = useState([]);
   const [winSourcesCount, setWinSourcesCount] = useState({});
   const [drawSourcesCount, setDrawSourcesCount] = useState({});
   const [teamDrawCount, setTeamDrawCount] = useState({});
@@ -183,6 +214,15 @@ function App() {
   // const [sourceAccaPred, setSourceAccaPred] = useState('betshoot');
   const [sourceWinPred, setSourceWinPred] = useState('footsuper');
 
+  const initialState = {
+    sortBy: [
+      {
+        id: 'count',
+        desc: true,
+      },
+    ],
+  };
+
   //TABLE
   const columnsBttsProd = [
           {
@@ -215,7 +255,264 @@ function App() {
           },
           {
             Header: "Btts Yes",
-            accessor: "bttsYes",
+            accessor: "bttsRes",
+          },
+          {
+            Header: "Over 05",
+            accessor: "over05",
+          },
+        ];
+  const columnsBttsAdm = [
+    
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            // first group - TV Show
+            Header: "Over & Btts",
+            // First group columns
+            columns: [
+              {
+                Header: "Count",
+                accessor: "count",
+              },
+              {
+                Header: "Acc Count",
+                accessor: "numAcca",
+              },
+              {
+                Header: "Btts Yes Num",
+                accessor: "bttsYesNum",
+              },
+              {
+                Header: "Btts No Num",
+                accessor: "bttsNoNum",
+              },              
+            ],
+          },
+          // {
+          //   // first group - TV Show
+          //   Header: "Btts",
+          //   // First group columns
+          //   columns: [
+          //     {
+          //       Header: "Btts Count",
+          //       accessor: "bttsCount",
+          //     },
+          //     {
+          //       Header: "Acc Count",
+          //       accessor: "bttsAccaCount",
+          //     },
+          //     {
+          //       Header: "Btts Yes Num",
+          //       accessor: "bttsYesNum",
+          //     },
+          //     {
+          //       Header: "Btts No Num",
+          //       accessor: "bttsNoNum",
+          //     },
+          //   ],
+          // },
+          // {
+          //   // first group - TV Show
+          //   Header: "Over25",
+          //   // First group columns
+          //   columns: [
+          //     {
+          //       Header: "O25 Count",
+          //       accessor: "overCount",
+          //     },
+          //     {
+          //       Header: "Acc Count",
+          //       accessor: "overAccaCount",
+          //     }
+          //   ],
+          // },
+          {
+            // first group - TV Show
+            Header: "Under25",
+            // First group columns
+            columns: [
+              {
+                Header: "U25 Count",
+                accessor: "underCount",
+              },
+              {
+                Header: "Acc Count",
+                accessor: "underAccaCount",
+              }
+            ],
+          },
+          {
+            // first group - TV Show
+            Header: "Win",
+            // First group columns
+            columns: [
+              {
+                Header: "Win Count",
+                accessor: "winCount",
+              },
+              {
+                Header: "Acc Count",
+                accessor: "winAccaCount",
+              }
+            ],
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Over 05",
+            accessor: "over05",
+          },
+          // {
+          //   // first group - TV Show
+          //   Header: "Draw",
+          //   // First group columns
+          //   columns: [
+          //     {
+          //       Header: "Draw Count",
+          //       accessor: "drawCount",
+          //     },
+          //     {
+          //       Header: "Acc Count",
+          //       accessor: "drawAccaCount",
+          //     }
+          //   ],
+          // },
+        ];
+  const columnsOverProd = [
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            Header: "Count",
+            accessor: "count",
+          },
+          {
+            Header: "Acc Count",
+            accessor: "numAcca",
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Over Yes",
+            accessor: "overYes",
+          },
+          {
+            Header: "Over 05",
+            accessor: "over05",
+          },
+        ];
+  const columnsUnderProd = [
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            Header: "Count",
+            accessor: "count",
+          },
+          {
+            Header: "Acc Count",
+            accessor: "numAcca",
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Under Yes",
+            accessor: "underYes",
+          },
+          {
+            Header: "Under 45",
+            accessor: "under45",
+          },
+        ];
+  const columnsWinProd = [
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            Header: "Prediction",
+            accessor: "prediction",
+          },
+          {
+            Header: "Count",
+            accessor: "count",
+          },
+          {
+            Header: "Acc Count",
+            accessor: "numAcca",
+          },
+          {
+            Header: "Win Count",
+            accessor: "winNum",
+          },
+          {
+            Header: "Xwin Count",
+            accessor: "xwinNum",
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Win Yes",
+            accessor: "winRes",
+          },
+          {
+            Header: "Over 05",
+            accessor: "over05",
+          },
+        ];
+  const columnsDrawProd = [
+          {
+            Header: "Home Team",
+            accessor: "homeTeam",
+          },
+          {
+            Header: "Away Team",
+            accessor: "awayTeam",
+          },
+          {
+            Header: "Count",
+            accessor: "count",
+          },
+          {
+            Header: "Acc Count",
+            accessor: "numAcca",
+          },
+          {
+            Header: "Result",
+            accessor: "resultScore",
+          },
+          {
+            Header: "Draw Yes",
+            accessor: "drawYes",
           },
         ];
 
@@ -229,8 +526,28 @@ function App() {
     setValue(newValue);
   }
   async function handleLoadResProd() {
-    console.log('resultsLocal333')
+    
     for (let i = 0; i < resultsLocal.length; i++) {
+      for (let j = 0; j < bttsAndOverArr.length; j++) {
+        if (
+          resultsLocal[i].homeTeam === bttsAndOverArr[j].homeTeam ||
+          // sortedResults[i].homeTeam.length === sortedBtts[j].homeTeam.length && sortedBtts[j].homeTeam.length === utils.LCSubStr(sortedResults[i].homeTeam,sortedBtts[j].homeTeam, sortedResults[i].homeTeam.length ,sortedBtts[j].homeTeam.length ) ||
+          // (longestSubstring / sortedResults[i].homeTeam.length)*100 >= 45
+
+          bttsAndOverArr[j].homeTeam.includes(resultsLocal[i].homeTeam) ||
+          // resultsLocal[i].homeTeam.includes(bttsAndOverArr[j].homeTeam) ||
+          resultsLocal[i].homeTeam === getHomeTeamName(bttsAndOverArr[j].homeTeam)
+        ) {
+          bttsAndOverArr[j].resultScore = resultsLocal[i].score;
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 ||
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0) {
+            bttsAndOverArr[j].over05 = 'true';
+          } else {
+            bttsAndOverArr[j].over05 = 'false';
+          }
+          
+        }
+      }
       for (let j = 0; j < productionBttsLocal.length; j++) {
         if (
           resultsLocal[i].homeTeam === productionBttsLocal[j].homeTeam ||
@@ -242,8 +559,19 @@ function App() {
           resultsLocal[i].homeTeam === getHomeTeamName(productionBttsLocal[j].homeTeam)
         ) {
           productionBttsLocal[j].resultScore = resultsLocal[i].score;
-          productionBttsLocal[j].bttsYes = parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 &&
-          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0;
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 &&
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0) {
+            productionBttsLocal[j].bttsRes = 'true';
+          } else {
+            productionBttsLocal[j].bttsRes = 'false';
+          }
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 ||
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0) {
+            productionBttsLocal[j].over05 = 'true';
+          } else {
+            productionBttsLocal[j].over05 = 'false';
+          }
+          
         }
       }
       for (let j = 0; j < productionOverLocal.length; j++) {
@@ -256,8 +584,20 @@ function App() {
           resultsLocal[i].homeTeam === getHomeTeamName(productionOverLocal[j].homeTeam)
         ) {
           productionOverLocal[j].resultScore = resultsLocal[i].score;
-          productionOverLocal[j].overYes = parseInt(resultsLocal[i].score.split(' - ')[0]) +
-          parseInt(resultsLocal[i].score.split(' - ')[1]) > 2;
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) +
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 2) {
+            productionOverLocal[j].overYes = 'true';
+          } else {
+            productionOverLocal[j].overYes = 'false';
+          }
+
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 ||
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0) {
+            productionOverLocal[j].over05 = 'true';
+          } else {
+            productionOverLocal[j].over05 = 'false';
+          }
+          
         }
       }
       for (let j = 0; j < productionUnderLocal.length; j++) {
@@ -270,8 +610,19 @@ function App() {
           resultsLocal[i].homeTeam === getHomeTeamName(productionUnderLocal[j].homeTeam)
         ) {
           productionUnderLocal[j].resultScore = resultsLocal[i].score;
-          productionUnderLocal[j].underYes = parseInt(resultsLocal[i].score.split(' - ')[0]) +
-          parseInt(resultsLocal[i].score.split(' - ')[1]) < 3;
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) +
+          parseInt(resultsLocal[i].score.split(' - ')[1]) < 3) {
+            productionUnderLocal[j].underYes = 'true';
+          } else {
+            productionUnderLocal[j].underYes = 'false';
+          }
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) +
+          parseInt(resultsLocal[i].score.split(' - ')[1]) < 5) {
+            productionUnderLocal[j].under45 = 'true';
+          } else {
+            productionUnderLocal[j].under45 = 'false';
+          }
+          
         }
       }
       for (let j = 0; j < productionWinLocal.length; j++) {
@@ -286,7 +637,23 @@ function App() {
           productionWinLocal[j].resultScore = resultsLocal[i].score;
           let win1 = parseInt(resultsLocal[i].score.split(' - ')[0]) > parseInt(resultsLocal[i].score.split(' - ')[1]);
           let win2 = parseInt(resultsLocal[i].score.split(' - ')[0]) < parseInt(resultsLocal[i].score.split(' - ')[1]);
-          productionWinLocal[j].winYes = (win1 && productionWinLocal[j].homeTeam === productionWinLocal[j].prediction) || (win2 && productionWinLocal[j].awayTeam === productionWinLocal[j].prediction);
+          if ((win1 && productionWinLocal[j].homeTeam === productionWinLocal[j].prediction) || (win2 && productionWinLocal[j].awayTeam === productionWinLocal[j].prediction)) {
+            productionWinLocal[j].winRes = 'true';
+          } else {
+            productionWinLocal[j].winRes = 'false';
+          }
+
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) > 0 ||
+          parseInt(resultsLocal[i].score.split(' - ')[1]) > 0) {
+            productionWinLocal[j].over05 = 'true';
+          } else {
+            productionWinLocal[j].over05 = 'false';
+          }
+          
+
+          // let xwin1 = parseInt(resultsLocal[i].score.split(' - ')[0]) >= parseInt(resultsLocal[i].score.split(' - ')[1]);
+          // let xwin2 = parseInt(resultsLocal[i].score.split(' - ')[0]) <= parseInt(resultsLocal[i].score.split(' - ')[1]);
+          // productionWinLocal[j].winRes = (win1 && productionWinLocal[j].homeTeam === productionWinLocal[j].prediction) || (win2 && productionWinLocal[j].awayTeam === productionWinLocal[j].prediction);
         }
       }
       for (let j = 0; j < productionDrawLocal.length; j++) {
@@ -299,12 +666,17 @@ function App() {
           resultsLocal[i].homeTeam === getHomeTeamName(productionDrawLocal[j].homeTeam)
         ) {
           productionDrawLocal[j].resultScore = resultsLocal[i].score;
-          productionDrawLocal[j].drawYes = parseInt(resultsLocal[i].score.split(' - ')[0]) ===
-          parseInt(resultsLocal[i].score.split(' - ')[1]);
+          if (parseInt(resultsLocal[i].score.split(' - ')[0]) ===
+          parseInt(resultsLocal[i].score.split(' - ')[1])) {
+            productionDrawLocal[j].drawYes = 'true';
+          } else {
+            productionDrawLocal[j].drawYes = 'false';
+          }
+          
         }
       }
     }
-    
+    console.log('productionBttsLocal333',productionBttsLocal);
   }
   function toggleZero() {
     console.log('toggleZero');
@@ -313,6 +685,416 @@ function App() {
   function toggleAddWin() {
     console.log('toggleAddWin');
     setAddWinToBtts((current) => !current);
+  }
+
+  function handleSaveUnderProd() {
+    if (productionUnderLocal.length !==0) {
+      const over2Sources = productionUnderLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      saveUnderProd(over2Sources);
+    }
+  }
+  function handleUpdUnderProd() {
+    // updateUnderProd();
+    if (productionUnderLocal.length !==0) {
+      const over2Sources = productionUnderLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      updateUnderProd(over2Sources);
+    }
+  }
+  function handleSaveBttsProd() {
+    if (productionBttsLocal.length !==0) {
+      const over2Sources = productionBttsLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      saveBttsProd(over2Sources);
+    }
+  }
+  function handleUpdBttsProd() {
+    // updateUnderProd();
+    if (productionBttsLocal.length !==0) {
+      const over2Sources = productionBttsLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      updateBttsProd(over2Sources);
+    }
+  }
+  function handleSaveOverProd() {
+    if (productionOverLocal.length !==0) {
+      const over2Sources = productionOverLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      saveOverProd(over2Sources);
+    }
+  }
+  function handleUpdOverProd() {
+    // updateUnderProd();
+    if (productionOverLocal.length !==0) {
+      const over2Sources = productionOverLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      updateOverProd(over2Sources);
+    }
+  }
+  function handleSaveWinProd() {
+    if (productionWinLocal.length !==0) {
+      const over2Sources = productionWinLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      saveWinProd(over2Sources);
+    }
+  }
+  function handleUpdWinProd() {
+    // updateUnderProd();
+    if (productionWinLocal.length !==0) {
+      const over2Sources = productionWinLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      updateWinProd(over2Sources);
+    }
+  }
+  function handleSaveDrawProd() {
+    if (productionDrawLocal.length !==0) {
+      const over2Sources = productionDrawLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      saveDrawProd(over2Sources);
+    }
+  }
+  function handleUpdDrawProd() {
+    // updateUnderProd();
+    if (productionDrawLocal.length !==0) {
+      const over2Sources = productionDrawLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      updateDrawProd(over2Sources);
+    }
+  }
+
+  //SAVING TODAY TOTAL PRODS 
+  function handleSaveTodayTotalUnder() {
+
+     if (productionUnderLocal.length !==0) {
+      const prodUnderFil = productionUnderLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      // console.log('prodOverFil',prodOverFil);
+      prodUnderFil.forEach(elem => {
+
+        elem.sources.forEach(item => {
+          const sourceName = `${getSourcesProdInverse(item)}_u25`;
+
+          let under25 = '';
+          let under35 = '';
+          let under45 = '';
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) +
+          parseInt(elem.resultScore.split(' - ')[1]) < 3) {
+            under25 = 'true';
+          } else {
+            under25 = 'false';
+          }
+          if (parseInt(elem.resultScore.split(' - ')[0]) +
+          parseInt(elem.resultScore.split(' - ')[1]) < 4) {
+            under35 = 'true';
+          } else {
+            under35 = 'false';
+          }
+          if (parseInt(elem.resultScore.split(' - ')[0]) +
+          parseInt(elem.resultScore.split(' - ')[1]) < 5) {
+            under45 = 'true';
+          } else {
+            under45 = 'false';
+          }
+
+          // const withItem = prodWinFil.filter(elem => elem.sources.includes(item));
+
+          let obj = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem.awayTeam,
+            sourceName: sourceName,
+            action: elem.action,
+            resScore: elem.resultScore,
+            date: todayDate,
+            under25,
+            under35,
+            under45
+          }
+
+          todayUnderStatArr.push(obj);
+        })
+      })
+
+      console.log('todayUnderStatArr',todayUnderStatArr);
+    }
+    if (todayUnderStatArr.length !==0) {
+      let sourcesArr = todayUnderStatArr.map(elem => elem.sourceName);
+      let uniqSources = [...new Set(sourcesArr)];
+
+      uniqSources.forEach(elem => {
+        let obj = {
+          source: elem,
+          action: 'under25',
+          totalPreds: todayUnderStatArr.filter(item => item.sourceName === elem).length,
+          under25Count: todayUnderStatArr.filter(item => item.sourceName === elem && item.under25 === 'true').length,
+          under35Count: todayUnderStatArr.filter(item => item.sourceName === elem && item.under35 === 'true').length,
+          under45Count: todayUnderStatArr.filter(item => item.sourceName === elem && item.under45 === 'true').length,
+          date: todayDate,
+        }
+        todayUnderStatTotalArr.push(obj);
+      })
+
+      console.log('todayUnderStatTotalArr',todayUnderStatTotalArr);
+      todayUnderStatTotalArr.length !==0 && setTodayStatDraw(todayUnderStatTotalArr);
+    }
+  }
+  function handleSaveTodayTotalOver() {
+    if (productionOverLocal.length !==0) {
+      const prodOverFil = productionOverLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      // console.log('prodOverFil',prodOverFil);
+      prodOverFil.forEach(elem => {
+
+        elem.sources.forEach(item => {
+          const sourceName = `${getSourcesProdInverse(item)}_o25`;
+
+          let over05 = '';
+          let over15 = '';
+          let over25 = '';
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) +
+          parseInt(elem.resultScore.split(' - ')[1]) > 2) {
+            over25 = 'true';
+          } else {
+            over25 = 'false';
+          }
+          if (parseInt(elem.resultScore.split(' - ')[0]) +
+          parseInt(elem.resultScore.split(' - ')[1]) > 1) {
+            over15 = 'true';
+          } else {
+            over15 = 'false';
+          }
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) > 0 ||
+          parseInt(elem.resultScore.split(' - ')[1]) > 0) {
+            over05 = 'true';
+          } else {
+            over05 = 'false';
+          }
+
+          // const withItem = prodWinFil.filter(elem => elem.sources.includes(item));
+
+          let obj = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem.awayTeam,
+            sourceName: sourceName,
+            action: elem.action,
+            resScore: elem.resultScore,
+            date: todayDate,
+            over05,
+            over15,
+            over25
+          }
+
+          todayOverStatArr.push(obj);
+        })
+      })
+
+      console.log('todayOverStatArr',todayOverStatArr);
+    }
+    if (todayOverStatArr.length !==0) {
+      let sourcesArr = todayOverStatArr.map(elem => elem.sourceName);
+      let uniqSources = [...new Set(sourcesArr)];
+
+      uniqSources.forEach(elem => {
+        let obj = {
+          source: elem,
+          action: 'over25',
+          totalPreds: todayOverStatArr.filter(item => item.sourceName === elem).length,
+          over05Count: todayOverStatArr.filter(item => item.sourceName === elem && item.over05 === 'true').length,
+          over15Count: todayOverStatArr.filter(item => item.sourceName === elem && item.over15 === 'true').length,
+          over25Count: todayOverStatArr.filter(item => item.sourceName === elem && item.over25 === 'true').length,
+          date: todayDate,
+        }
+        todayOverStatTotalArr.push(obj);
+      })
+
+      console.log('todayOverStatTotalArr',todayOverStatTotalArr);
+      todayOverStatTotalArr.length !==0 && setTodayStatDraw(todayOverStatTotalArr);
+    }
+  }
+  function handleSaveTodayTotalBtts() {
+
+    if (productionBttsLocal.length !==0) {
+      const prodBttsFil = productionBttsLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      // console.log('prodBttsFil',prodBttsFil);
+      prodBttsFil.forEach(elem => {
+
+        elem.sources.forEach(item => {
+          const sourceName = `${getSourcesProdInverse(item)}_btts`;
+
+          let over05 = '';
+          let bttsYes = '';
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) > 0 ||
+          parseInt(elem.resultScore.split(' - ')[1]) > 0) {
+            over05 = 'true';
+          } else {
+            over05 = 'false';
+          }
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) > 0 &&
+          parseInt(elem.resultScore.split(' - ')[1]) > 0) {
+            bttsYes = 'true';
+          } else {
+            bttsYes = 'false';
+          }
+
+          // const withItem = prodWinFil.filter(elem => elem.sources.includes(item));
+
+          let obj = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem.awayTeam,
+            sourceName: sourceName,
+            action: 'btts',
+            resScore: elem.resultScore,
+            date: todayDate,
+            over05,
+            bttsYes
+          }
+
+          todayBttsStatArr.push(obj);
+        })
+      })
+
+      console.log('todayBttsStatArr',todayBttsStatArr);
+    }
+    if (todayBttsStatArr.length !==0) {
+      let sourcesArr = todayBttsStatArr.map(elem => elem.sourceName);
+      let uniqSources = [...new Set(sourcesArr)];
+
+      uniqSources.forEach(elem => {
+        let obj = {
+          source: elem,
+          action: 'btts',
+          totalPreds: todayBttsStatArr.filter(item => item.sourceName === elem).length,
+          bttsYesCount: todayBttsStatArr.filter(item => item.sourceName === elem && item.bttsYes === 'true').length,
+          over05Count: todayBttsStatArr.filter(item => item.sourceName === elem && item.over05 === 'true').length,
+          date: todayDate,
+        }
+        todayBttsStatTotalArr.push(obj);
+      })
+
+      console.log('todayBttsStatTotalArr',todayBttsStatTotalArr);
+      todayBttsStatTotalArr.length !==0 && setTodayStatDraw(todayBttsStatTotalArr);
+    }
+  }
+  function handleCreateTodayStatArrWin() {
+    if (productionWinLocal.length !==0) {
+      const prodWinFil = productionWinLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      // console.log('prodWinFil',prodWinFil);
+      prodWinFil.forEach(elem => {
+
+        elem.sources.forEach(item => {
+          const sourceName = `${getSourcesProdInverse(item)}_win`;
+
+          let xwinRes = '';
+
+          let win1 = parseInt(elem.resultScore.split(' - ')[0]) > parseInt(elem.resultScore.split(' - ')[1]);
+          let win2 = parseInt(elem.resultScore.split(' - ')[0]) < parseInt(elem.resultScore.split(' - ')[1]);
+          let draw = parseInt(elem.resultScore.split(' - ')[0]) === parseInt(elem.resultScore.split(' - ')[1]);
+          if (((win1 || draw) && elem.homeTeam === elem.prediction) || ((win2 || draw) && elem.awayTeam === elem.prediction)) {
+            xwinRes = 'true';
+          } else {
+            xwinRes = 'false';
+          }
+
+          // const withItem = prodWinFil.filter(elem => elem.sources.includes(item));
+
+          let obj = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem.awayTeam,
+            sourceName: sourceName,
+            action: 'xwin',
+            resScore: elem.resultScore,
+            date: todayDate,
+            prediction: elem.prediction,
+            xwinRes
+          }
+
+          todayWinStatArr.push(obj);
+        })
+      })
+
+      console.log('todayWinStatArr',todayWinStatArr);
+    }
+    if (todayWinStatArr.length !==0) {
+      let sourcesArr = todayWinStatArr.map(elem => elem.sourceName);
+      let uniqSources = [...new Set(sourcesArr)];
+
+      uniqSources.forEach(elem => {
+        let obj = {
+          source: elem,
+          action: 'xwin',
+          totalPreds: todayWinStatArr.filter(item => item.sourceName === elem).length,
+          winYesCount: todayWinStatArr.filter(item => item.sourceName === elem && item.xwinRes === 'true').length,
+          date: todayDate,
+        }
+        todayWinStatTotalArr.push(obj);
+      })
+
+      console.log('todayWinStatTotalArr',todayWinStatTotalArr);
+      todayWinStatTotalArr.length !==0 && setTodayStatDraw(todayWinStatTotalArr);
+    }
+  }
+  function handleCreateTodayStatArrDraw() {
+    if (productionDrawLocal.length !==0) {
+      const prodDrawFil = productionDrawLocal.filter(elem => elem.count > 2 || elem.numAcca !==0);
+      // console.log('prodDrawFil',prodDrawFil);
+      prodDrawFil.forEach(elem => {
+
+        elem.sources.forEach(item => {
+          const sourceName = `${getSourcesProdInverse(item)}_draw`;
+          let drawYes = '';
+
+          if (parseInt(elem.resultScore.split(' - ')[0]) ===
+          parseInt(elem.resultScore.split(' - ')[1])) {
+            drawYes = 'true';
+          } else {
+            drawYes = 'false';
+          }
+
+          // const withItem = prodDrawFil.filter(elem => elem.sources.includes(item));
+
+          let obj = {
+            homeTeam: elem.homeTeam,
+            awayTeam: elem.awayTeam,
+            sourceName: sourceName,
+            action: elem.action,
+            resScore: elem.resultScore,
+            date: todayDate,
+            drawYes
+          }
+
+          todayDrawStatArr.push(obj);
+        })
+      })
+
+      console.log('todayDrawStatArr',todayDrawStatArr);
+    }
+    if (todayDrawStatArr.length !==0) {
+      let sourcesArr = todayDrawStatArr.map(elem => elem.sourceName);
+      let uniqSources = [...new Set(sourcesArr)];
+
+      uniqSources.forEach(elem => {
+        let obj = {
+          source: elem,
+          action: 'draw',
+          totalPreds: todayDrawStatArr.filter(item => item.sourceName === elem).length,
+          drawYesCount: todayDrawStatArr.filter(item => item.sourceName === elem && item.drawYes === 'true').length,
+          date: todayDate,
+        }
+        todayDrawStatTotalArr.push(obj);
+      })
+
+      console.log('todayDrawStatTotalArr',todayDrawStatTotalArr);
+      todayDrawStatTotalArr.length !==0 && setTodayStatDraw(todayDrawStatTotalArr);
+    }
+  }
+
+  function handleSaveDailyStatToMongoDraw() {
+
+  }
+  function handleSaveDailyStatToMongoWin() {
+
+  }
+  function handleSaveDailyStatToMongoBtts() {
+
+  }
+  function handleSaveDailyStatToMongoOver() {
+
+  }
+  function handleSaveDailyStatToMongoUnder() {
+    
   }
 
   async function handleLoadWithVpn() {
@@ -327,12 +1109,12 @@ function App() {
       res3 === 'win VPN loaded' &&
       res4 === 'draws VPN loaded' &&
       res5 === 'under VPN loaded' &&
-      setVpnDataExist(true);
-    vpnDataExist && setLoader(false);
+      setLoader(false);
   }
   async function handleLoadBtts() {
     setLoader(true);
     const res = await loadBtts();
+    console.log('22233',res)
     res === 'btts loaded' && setBttsDataExist(true);
     setLoader(false);
   }
@@ -346,6 +1128,7 @@ function App() {
   async function handleLoadUnder() {
     setLoader(true);
     const res = await loadUnder();
+    console.log('22233',res)
     res === 'under loaded' && setUnderDataExist(true);
     setLoader(false);
   }
@@ -416,7 +1199,7 @@ function App() {
     setLoader(false);
   }
 
-  async function Prodult() {
+  async function handleLoadResults() {
     setLoader(true);
     const res = await loadResult();
     res === 'result loaded' && setResultDataExist(true);
@@ -599,23 +1382,30 @@ function App() {
 
     
       
-    if (arr.every((elem) => elem.action.includes('btts'))) {
-      Object.keys(obj).forEach((key) => {
+    if (arr.some((elem) => elem.action.includes('btts'))) {
+      Object.keys(obj).forEach((key, i) => {
         let fff = arr.filter((elem) => elem.homeTeam === key &&  elem.awayTeam && elem.awayTeam !== '')[0];
         obj1[key] = {
           homeTeam: key,
           awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
           count: obj[key],
-          // hasAcca: arr.some((elem) => elem.homeTeam === key && elem.isAcca),
+          sources: arr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
           numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
           bttsYesNum: arr.filter((elem) => elem.homeTeam === key && !elem.action.includes('btts no')).length,
           bttsNoNum: arr.filter((elem) => elem.homeTeam === key && elem.action.includes('btts no')).length,
           resultScore: '',
-          bttsYes: null
+          bttsRes: '',
+          date: todayDate,
+          totalSources: bttsSourcesLength,
+          totalItems: bttsOnlyLocal.length
         };
+        // if (i === 0) {
+        //   obj1[key].totalSources = bttsSourcesLength;
+        //   obj1[key].totalItems = bttsItemsLength;
+        // }
       });
     } else if (arr.some((elem) => elem.action.includes('xwin'))) {
-      Object.keys(obj).forEach((key) => {
+      Object.keys(obj).forEach((key, i) => {
 
         let elems = arr.filter(elem => elem.homeTeam === key);
         // console.log('elems', elems);
@@ -632,12 +1422,20 @@ function App() {
             awayTeam: elem && elem.hasOwnProperty('awayTeam') && elem.awayTeam,
             prediction: elem && elem.hasOwnProperty('prediction') && elem.prediction,
             count: homeWinArr.length,
+            sources: homeWinArr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
             numAcca: homeWinArr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
             winNum: homeWinArr.filter((elem) => elem.homeTeam === key && (elem.action === 'win' || elem.action.includes('win ') || elem.action.includes('2win') || elem.action.includes('win 1') || elem.action.includes('win 2'))).length,
             xwinNum: homeWinArr.filter((elem) => elem.homeTeam === key && elem.action.includes('xwin')).length,
             resultScore: '',
-            winYes: null
+            winRes: '',
+            date: todayDate,
+            totalSources: winSourcesLength,
+            totalItems: over25OnlyLocal.length
           };
+          // if (i === 0) {
+          //   obj1[key].totalSources = Object.keys(winSourcesCount).length;
+          //   obj1[key].totalItems = winDataLocal.lenght;
+          // }
         })
         awayWinArr.length !==0 && awayWinArr.forEach(elem => {
           obj1[`${key} 2`] = {
@@ -645,12 +1443,20 @@ function App() {
             awayTeam: elem && elem.hasOwnProperty('awayTeam') && elem.awayTeam,
             prediction: elem && elem.hasOwnProperty('prediction') && elem.prediction,
             count: awayWinArr.length,
+            sources: awayWinArr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
             numAcca: awayWinArr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
             winNum: awayWinArr.filter((elem) => elem.homeTeam === key && (elem.action === 'win' || elem.action.includes('win ') || elem.action.includes('2win') || elem.action.includes('win 1') || elem.action.includes('win 2'))).length,
             xwinNum: awayWinArr.filter((elem) => elem.homeTeam === key && elem.action.includes('xwin')).length,
             resultScore: '',
-            winYes: null
+            winRes: '',
+            date: todayDate,
+            totalSources: winSourcesLength,
+            totalItems: winDataLocal.length
           };
+          // if (i === 0) {
+          //   obj1[key].totalSources = Object.keys(winSourcesCount).length;
+          //   obj1[key].totalItems = winDataLocal.lenght;
+          // }
         })
 
 
@@ -674,29 +1480,79 @@ function App() {
         
       });
     } else {
-      Object.keys(obj).forEach((key) => {
+      Object.keys(obj).forEach((key, i) => {
         let fff = arr.filter((elem) => elem.homeTeam === key &&  elem.awayTeam && elem.awayTeam !== '')[0];
         let action = '';
 
         if (arr.length !==0) {
-          if (arr[0].action.includes('under25')) {
+          // if (arr[0].action.includes('under25')) {
+          if (arr.some((elem) => elem.action.includes('under25'))) {
             action = 'under25';
-          } else if (arr[0].action.includes('over25')) {
+
+            obj1[key] = {
+              homeTeam: key,
+              awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+              count: obj[key],
+              sources: arr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
+              numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+              action: action,
+              resultScore: '',
+              underYes: '',
+              date: todayDate,
+              totalSources: underSourcesLength,
+              totalItems: under25DataLocal.length
+            };
+            // if (i === 0) {
+            //   obj1[key].totalSources = Object.keys(underSourcesCount).length;
+            //   obj1[key].totalItems = under25DataLocal.lenght;
+            // }
+          // } else if (arr[0].action.includes('over25')) {
+          } else if (arr.some((elem) => elem.action.includes('over25'))) {
             action = 'over25';
-          } else if (arr[0].action.includes('draws')) {
+
+            obj1[key] = {
+              homeTeam: key,
+              awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+              count: obj[key],
+              sources: arr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
+              numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+              action: action,
+              resultScore: '',
+              overYes: '',
+              date: todayDate,
+              totalSources: overSourcesLength,
+              totalItems: over25OnlyLocal.length
+            };
+            // if (i === 0) {
+            //   obj1[key].totalSources = Object.keys(overSourcesCount).length;
+            //   obj1[key].totalItems = over25OnlyLocal.lenght;
+            // }
+          // } else if (arr[0].action.includes('draws')) {
+          } else if (arr.some((elem) => elem.action.includes('draws'))) {
             action = 'draws';
+
+            obj1[key] = {
+                homeTeam: key,
+                awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
+                count: obj[key],
+                sources: arr.filter((elem) => elem.homeTeam === key &&  elem.source && elem.source !== '').map(item => getSourcesProd(item.source)),
+                numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
+                action: action,
+                resultScore: '',
+                drawYes: '',
+                date: todayDate,
+                totalSources: drawSourcesLength,
+                totalItems: drawDataLocal.length
+            };
+            // if (i === 0) {
+            //   obj1[key].totalSources = Object.keys(drawSourcesCount).length;
+            //   obj1[key].totalItems = drawDataLocal.lenght;
+            // }
           }
         }
+        
 
-        obj1[key] = {
-          homeTeam: key,
-          awayTeam: fff && fff.hasOwnProperty('awayTeam') && fff.awayTeam,
-          count: obj[key],
-          // hasAcca: arr.some((elem) => elem.homeTeam === key && elem.isAcca),
-          numAcca: arr.filter((elem) => elem.homeTeam === key && elem.isAcca).length,
-          action: action,
-          resultScore: ''
-        };
+        
       });
     }
 
@@ -729,15 +1585,18 @@ function App() {
     //GET BTTS
     let bttsDataMongo = await getBtts(todayDate);
 
-    bttsDataMongo = bttsDataMongo.map((elem) => {
+    bttsDataMongo = bttsDataMongo.filter(item => item.homeTeam !== 'BTTS/GG').map((elem) => {
       let obj = { ...elem };
       let homeTeam = elem.homeTeam
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
       .replace('SG ', '')
       .replace('CD ', '')
       .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -755,10 +1614,13 @@ function App() {
         elem.awayTeam
         .replace('SSC ', '')
         .replace('SC ', '')
+        .replace('CS ', '')
         .replace('SG ', '')
         .replace('CD ', '')
         .replace(' IS', '')
         .replace('1. ', '')
+        .replace('1.', '')
+        .replace('1 ', '')
         .replace('FC ', '')
         .replace('FK ', '')
         .replace(' IF', '')
@@ -781,15 +1643,23 @@ function App() {
       elem.action.includes('btts')
     );
     const overDataOnly = bttsDataMongo.filter(
-      (elem) => elem.action === 'over25'
+      (elem) => elem.action === 'over25' || elem.action === 'high score'
     );
 
-    bttsLocal.length !== 0 && setBttsOnlyLocal([]);
-    overLocal.length !== 0 && setOverLocal([]);
+    bttsOnlyLocal.length !== 0 && setBttsOnlyLocal([]);
+    over25OnlyLocal.length !== 0 && setOver25OnlyLocal([]);
     setBttsOnlyLocal(bttsDataOnly);
-    setOverLocal(overDataOnly);
+    setOver25OnlyLocal(overDataOnly);
 
-    
+    console.log('bttsDataOnly.length',bttsDataOnly); 
+    console.log('overDataOnly.length',overDataOnly); 
+
+    let countedObjBtts = bttsDataOnly.length !== 0 && countByProp(bttsDataOnly, 'source');
+    countedObjBtts && setBttsSourcesLength(Object.keys(countedObjBtts).length); 
+
+    let countedObjOver = overDataOnly.length !== 0 && countByProp(overDataOnly, 'source');
+    countedObjOver && setOverSourcesLength(Object.keys(countedObjOver).length); 
+    // bttsDataOnly.length !== 0 && setBttsItemsLength(bttsDataOnly.lenght);
 
     //GET WIN
     let winDataMongo = await getWinData(todayDate);
@@ -798,10 +1668,13 @@ function App() {
       let homeTeam = elem.homeTeam
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
       .replace('SG ', '')
       .replace('CD ', '')
-        .replace(' IS', '')
+      .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -818,10 +1691,13 @@ function App() {
         elem.awayTeam
         .replace('SSC ', '')
         .replace('SC ', '')
+        .replace('CS ', '')
         .replace('SG ', '')
         .replace('CD ', '')
         .replace(' IS', '')
         .replace('1. ', '')
+        .replace('1.', '')
+        .replace('1 ', '')
         .replace('FC ', '')
         .replace('FK ', '')
         .replace(' IF', '')
@@ -835,10 +1711,13 @@ function App() {
       let pred = elem.prediction
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
       .replace('SG ', '')
       .replace('CD ', '')
-        .replace(' IS', '')
+      .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -857,6 +1736,9 @@ function App() {
     winDataLocal.length !== 0 && setWinDataLocal([]);
     setWinDataLocal(winDataMongo);
 
+    let countedObjWin = winDataMongo.length !== 0 && countByProp(winDataMongo, 'source');
+    countedObjWin && setWinSourcesLength(Object.keys(countedObjWin).length); 
+
     //GET DRAW
     let drawDataMongo = await getDraw(todayDate);
     drawDataMongo = drawDataMongo.map((elem) => {
@@ -864,10 +1746,13 @@ function App() {
       let homeTeam = elem.homeTeam
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
       .replace('SG ', '')
       .replace('CD ', '')
-        .replace(' IS', '')
+      .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -884,10 +1769,13 @@ function App() {
         elem.awayTeam
         .replace('SSC ', '')
         .replace('SC ', '')
+        .replace('CS ', '')
         .replace('SG ', '')
         .replace('CD ', '')
         .replace(' IS', '')
         .replace('1. ', '')
+        .replace('1.', '')
+        .replace('1 ', '')
         .replace('FC ', '')
         .replace('FK ', '')
         .replace(' IF', '')
@@ -902,9 +1790,12 @@ function App() {
       obj.awayTeam = getHomeTeamName(awayTeam);
       return obj;
     });
-    console.log('drawDataMongo222', drawDataMongo);
+    // console.log('drawDataMongo222', drawDataMongo);
     drawDataLocal.length !== 0 && setDrawDataLocal([]);
     setDrawDataLocal(drawDataMongo);
+
+    let countedObjDraw = drawDataMongo.length !== 0 && countByProp(drawDataMongo, 'source');
+    countedObjDraw && setDrawSourcesLength(Object.keys(countedObjDraw).length); 
 
     //GET UNDER
     let under25DataMongo = await getUnder(todayDate);
@@ -913,10 +1804,13 @@ function App() {
       let homeTeam = elem.homeTeam
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
       .replace('SG ', '')
       .replace('CD ', '')
-        .replace(' IS', '')
+      .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -933,10 +1827,13 @@ function App() {
         elem.awayTeam
         .replace('SSC ', '')
         .replace('SC ', '')
+        .replace('CS ', '')
         .replace('SG ', '')
         .replace('CD ', '')
         .replace(' IS', '')
         .replace('1. ', '')
+        .replace('1.', '')
+        .replace('1 ', '')
         .replace('FC ', '')
         .replace('FK ', '')
         .replace(' IF', '')
@@ -955,6 +1852,9 @@ function App() {
     under25DataLocal.length !== 0 && setUnder25DataLocal([]);
     setUnder25DataLocal(sortedUnder25);
 
+    let countedObjUnder = under25DataMongo.length !== 0 && countByProp(under25DataMongo, 'source');
+    countedObjUnder && setUnderSourcesLength(Object.keys(countedObjUnder).length); 
+
     //GET RESULT AND TOTAL
     const resultsTotalData = await getResultTotal(todayDate);
 
@@ -965,10 +1865,20 @@ function App() {
       let homeTeam = elem.homeTeam
       .replace('SSC ', '')
         .replace('SC ', '')
+        .replace('CS ', '')
+        .replace('SV ', '')
+        .replace('AD ', '')
+        .replace('SD ', '')
+        .replace('UD ', '')
+        .replace('CA ', '')
+        .replace('EC ', '')
+        .replace('CF ', '')
         .replace('SG ', '')
         .replace('CD ', '')
         .replace(' IS', '')
         .replace('1. ', '')
+        .replace('1.', '')
+        .replace('1 ', '')
         .replace('FC ', '')
         .replace('FK ', '')
         .replace(' IF', '')
@@ -982,10 +1892,16 @@ function App() {
       let awayTeam = elem.awayTeam
       .replace('SSC ', '')
       .replace('SC ', '')
+      .replace('CS ', '')
+      .replace('SD ', '')
+      .replace('AD ', '')
+      .replace('UD ', '')
       .replace('SG ', '')
       .replace('CD ', '')
-        .replace(' IS', '')
+      .replace(' IS', '')
       .replace('1. ', '')
+      .replace('1.', '')
+      .replace('1 ', '')
       .replace('FC ', '')
       .replace('FK ', '')
       .replace(' IF', '')
@@ -1000,7 +1916,7 @@ function App() {
       obj.awayTeam = getHomeTeamName(awayTeam);
       return obj;
     });
-    console.log('resultsData444', resultsData);
+    
     resultsLocal.length !== 0 && setResultsLocal([]);
     setResultsLocal(resultsData);
 
@@ -1008,41 +1924,139 @@ function App() {
     setResultsTotalLocal(resultsTotalData);
     setResultsTotalLocalFil(resultsTotalData);
 
+    console.log('winDataMongo444', winDataMongo);
+    
+    let countedHomeTeamAdmBtts =
+      bttsDataMongo.length !== 0 && countByPropTeams(bttsDataMongo, 'homeTeam');
+
+      Object.keys(countedHomeTeamAdmBtts).forEach(elem => {
+        if (countedHomeTeamAdmBtts[elem].count < 2) {
+          delete countedHomeTeamAdmBtts[elem]
+        }
+      })
+
+    console.log('countedHomeTeamAdmBtts444', countedHomeTeamAdmBtts);
+    setBttsHomeTeamCount(countedHomeTeamAdmBtts);
+
+    
+    
+    const countedPredTeam =
+    winDataLocal.length !== 0 && countByPropTeams(winDataLocal, 'homeTeam');
+    countedPredTeam && setWinPredTeamCount(countedPredTeam);
+    const countedTeamDraw =
+    drawDataLocal.length !== 0 && countByPropTeams(drawDataLocal, 'homeTeam');
+    countedTeamDraw && setTeamDrawCount(countedTeamDraw);
+    const countedHomeTeamUnder =
+      under25DataLocal.length !== 0 &&
+      countByPropTeams(under25DataLocal, 'homeTeam');
+      countedHomeTeamUnder && setUnderHomeTeamCount(countedHomeTeamUnder);
+
+    await setResultsTotal(resultsTotalData);
+
+    //Form submission happens here
+  };
+
+  const handleCreateLoadMonitor = async () => {
+    //ADM AND MONITOR
+
+    console.log('over25OnlyLocal333', over25OnlyLocal);
+
+    let countedObjBtts =
+    bttsOnlyLocal.length !== 0 && countByProp(bttsOnlyLocal, 'source');
+      countedObjBtts && setBttsSourcesCount(countedObjBtts); 
+
+    let countedObjOver =
+    over25OnlyLocal.length !== 0 && countByProp(over25OnlyLocal, 'source');
+      countedObjOver && setOverSourcesCount(countedObjOver); 
+
+    const countedObjWin =
+      winDataLocal.length !== 0 && countByProp(winDataLocal, 'source');
+ 
+    countedObjWin && setWinSourcesCount(countedObjWin);
+
+    const countedObjDraw =
+      drawDataLocal.length !== 0 && countByProp(drawDataLocal, 'source');
+   
+    countedObjDraw && setDrawSourcesCount(countedObjDraw);
     
 
-    //   console.log('countedObjBtts',countedObjBtts);
-
-    // let sources = Object.keys(zeroCounter).filter(elem => (elem.includes('btts') || elem.includes('over')));
-    // let sourcesCounted = Object.keys(countedObjBtts);
-
-    // console.log('sources',sources);
-    // console.log('sourcesCounted',sourcesCounted);
-
-    // countedObjBtts = sources.forEach(source => {
-    //   if (!sourcesCounted.includes(source)) {
-    //     const obj = {source: 0};
-    //     return {...countedObjBtts, ...obj}
-    //   }
-    // })
-
-
+    const countedObjUnder =
+      under25DataLocal.length !== 0 && countByProp(under25DataLocal, 'source');
+    
+    countedObjUnder && setUnderSourcesCount(countedObjUnder);
+    
+  }
+  const handleCreateProd = async () => {
     //PRODUCTION OBJECTS
-    console.log('bttsDataOnly444', bttsDataOnly);
-    console.log('winDataLocal444', winDataLocal.length !== 0 && winDataLocal);
+    // console.log('bttsDataOnly444', bttsOnlyLocal);
+    // console.log('winDataLocal444', winDataLocal.length !== 0 && winDataLocal);
     
+    console.log('bttsHomeTeamCount444', bttsHomeTeamCount);
 
     let productionBtts =
-      bttsDataOnly.length !== 0 && countByPropTeams(bttsDataOnly, 'homeTeam');
+      bttsOnlyLocal.length !== 0 && countByPropTeams(bttsOnlyLocal, 'homeTeam');
     let productionOver =
-      bttsDataOnly.length !== 0 && countByPropTeams(overDataOnly, 'homeTeam');
+    over25OnlyLocal.length !== 0 && countByPropTeams(over25OnlyLocal, 'homeTeam');
     let productionWin =
     winDataLocal.length !== 0 && countByPropTeams(winDataLocal, 'homeTeam');
+
+    console.log('productionBtts222',productionBtts);
     let productionUnder =
     under25DataLocal.length !== 0 && countByPropTeams(under25DataLocal, 'homeTeam');
+    console.log('productionUnder222',productionUnder);
+
     let productionDraw =
     drawDataLocal.length !== 0 && countByPropTeams(drawDataLocal.length !== 0 && drawDataLocal, 'homeTeam');
 
-    
+    if (bttsHomeTeamCount) {
+      console.log('bttsHomeTeamCount222',bttsHomeTeamCount);
+      Object.keys(bttsHomeTeamCount).forEach(elem => {
+        if (productionOver[elem]) {
+          bttsHomeTeamCount[elem].overCount = productionOver[elem].count;
+          bttsHomeTeamCount[elem].overAccaCount = productionOver[elem].numAcca;
+        } else {
+          bttsHomeTeamCount[elem].overCount = 0;
+          bttsHomeTeamCount[elem].overAccaCount = 0;
+        }
+        if (productionBtts[elem]) {
+          bttsHomeTeamCount[elem].bttsCount = productionBtts[elem].count;
+          bttsHomeTeamCount[elem].bttsAccaCount = productionBtts[elem].numAcca;
+          bttsHomeTeamCount[elem].bttsYesNum = productionBtts[elem].bttsYesNum;
+          bttsHomeTeamCount[elem].bttsNoNum = productionBtts[elem].bttsNoNum;
+        } else {
+          bttsHomeTeamCount[elem].bttsCount = 0;
+          bttsHomeTeamCount[elem].bttsAccaCount = 0;
+          bttsHomeTeamCount[elem].bttsYesNum = 0;
+          bttsHomeTeamCount[elem].bttsNoNum = 0;
+        }
+        if (productionUnder[elem]) {
+          bttsHomeTeamCount[elem].underCount = productionUnder[elem].count;
+          bttsHomeTeamCount[elem].underAccaCount = productionUnder[elem].numAcca;
+        } else {
+          bttsHomeTeamCount[elem].underCount = 0;
+          bttsHomeTeamCount[elem].underAccaCount = 0;
+        }
+        if (productionWin[elem]) {
+          bttsHomeTeamCount[elem].winCount = productionWin[elem].count;
+          bttsHomeTeamCount[elem].winAccaCount = productionWin[elem].numAcca;
+        } else {
+          bttsHomeTeamCount[elem].winCount = 0;
+          bttsHomeTeamCount[elem].winAccaCount = 0;
+        }
+        // if (productionDraw[elem]) {
+        //   bttsHomeTeamCount[elem].drawCount = productionDraw[elem].count;
+        //   bttsHomeTeamCount[elem].drawAccaCount = productionDraw[elem].numAcca;
+        // } else {
+        //   bttsHomeTeamCount[elem].drawCount = 0;
+        //   bttsHomeTeamCount[elem].drawAccaCount = 0;
+        // }
+        
+      })
+
+      let countedAdmBttsAndOver = bttsHomeTeamCount && Object.values(bttsHomeTeamCount);
+      console.log('countedAdmBttsAndOver222',countedAdmBttsAndOver);
+      countedAdmBttsAndOver.length !== 0 && setBttsAndOverArr(countedAdmBttsAndOver);
+    }
 
 
     Object.keys(productionBtts).forEach(elem => {
@@ -1097,48 +2111,8 @@ function App() {
     console.log('productionDraw555', productionDraw);
 
 
-
-    //ADM AND MONITOR
-
-    let countedObjBtts =
-      bttsDataMongo.length !== 0 && countByProp(bttsDataMongo, 'source');
-
-    let countedHomeTeamAdmBtts =
-      bttsDataMongo.length !== 0 && countByPropTeams(bttsDataMongo, 'homeTeam');
-
-
-    countedObjBtts && setBttsSourcesCount(countedObjBtts);
-    countedHomeTeamAdmBtts && setBttsHomeTeamCount(countedHomeTeamAdmBtts);
-
-    // console.log('countedHomeTeamBtts', countedHomeTeamBtts);
-
-    const countedObjWin =
-      winDataMongo.length !== 0 && countByProp(winDataMongo, 'source');
-    const countedPredTeam =
-      winDataMongo.length !== 0 && countByPropTeams(winDataMongo, 'homeTeam');
-    countedObjWin && setWinSourcesCount(countedObjWin);
-    countedPredTeam && setWinPredTeamCount(countedPredTeam);
-
-    const countedObjDraw =
-      drawDataMongo.length !== 0 && countByProp(drawDataMongo, 'source');
-    const countedTeamDraw =
-      drawDataMongo.length !== 0 && countByPropTeams(drawDataMongo, 'homeTeam');
-    countedObjDraw && setDrawSourcesCount(countedObjDraw);
-    countedTeamDraw && setTeamDrawCount(countedTeamDraw);
-
-    const countedObjUnder =
-      under25DataMongo.length !== 0 && countByProp(under25DataMongo, 'source');
-    const countedHomeTeamUnder =
-      under25DataMongo.length !== 0 &&
-      countByPropTeams(under25DataMongo, 'homeTeam');
-    countedObjUnder && setUnderSourcesCount(countedObjUnder);
-    countedHomeTeamUnder && setUnderHomeTeamCount(countedHomeTeamUnder);
-
-    await setResultsTotal(resultsTotalData);
-
-    //Form submission happens here
-  };
-
+    
+  }
   const handleDeleteResultClick = async (homeTeam) => {
     await deleteResultsTotalMongo(homeTeam);
   };
@@ -1475,14 +2449,18 @@ function App() {
                 <button class="button" onClick={loadTest}>
                   Load Test
                 </button>
-                {bttsDataExist &&
+                <button class="button" onClick={handleLoadWithVpn}>
+                      Load With Vpn
+                    </button>
+                {/* {bttsDataExist &&
                   winDataExist &&
                   drawDataExist &&
                   overDataExist && (
                     <button class="button" onClick={handleLoadWithVpn}>
                       Load With Vpn
                     </button>
-                  )}
+                  )} */}
+                  
               </>
             )}
           </form>
@@ -1611,7 +2589,7 @@ function App() {
                         <button
                           class="button"
                           type="button"
-                          onClick={() => Prodult()}
+                          onClick={() => handleLoadResults()}
                         >
                           load result
                         </button>
@@ -1662,8 +2640,9 @@ function App() {
           <Tab label="Win Preds" {...a11yProps(4)} />
           <Tab label="Draws" {...a11yProps(5)} />
           <Tab label="Zeros" {...a11yProps(6)} />
-          <Tab label="Load Monitor" {...a11yProps(7)} />
+          <Tab label="Load Mon" {...a11yProps(7)} />
           <Tab label="Prod" {...a11yProps(8)} />
+          <Tab label="Stat" {...a11yProps(9)} />
           {/*<Tab label="Item Four" {...a11yProps(3)} />
           <Tab label="Item Five" {...a11yProps(4)} />
           <Tab label="Item Six" {...a11yProps(5)} />
@@ -1721,12 +2700,15 @@ function App() {
             >
               <option value="accum_btts">accum_btts</option>
               <option value="accum_o25">accum_o25</option>
+              <option value="fst_btts">fst_btts</option>
+              <option value="fst_o25">fst_o25</option>
+              <option value="fbp_btts">fbp_btts</option>
+              <option value="fbp_o25">fbp_o25</option>
               <option value="wdw_btts">wdw_btts</option>
               <option value="wdw_o25">wdw_o25</option>
-              <option value="fst">fst</option>
               <option value="footsuper">footsuper</option>
               <option value="redscores">redscores</option>
-              <option value="fbp">fbp</option>
+              <option value="fbp_btts">fbp_btts</option>
               <option value="betshoot">betshoot</option>
               <option value="betclan_btts">betclan_btts</option>
               <option value="betclan_o25">betclan_o25</option>
@@ -1801,7 +2783,8 @@ function App() {
                   width: '100%',
                 }}
               >
-                {Object.keys(bttsHomeTeamCount).length !== 0 &&
+                <Table columns={columnsBttsAdm} data={bttsAndOverArr} initialState={initialState}/>
+                {/* {Object.keys(bttsHomeTeamCount).length !== 0 &&
                   Object.keys(bttsHomeTeamCount).map((homeTeam, i) => {
                     return (
                       <li
@@ -1843,7 +2826,7 @@ function App() {
                         )}
                       </li>
                     );
-                  })}
+                  })} */}
               </ul>
             </div>
           </div>
@@ -3167,10 +4150,13 @@ function App() {
         </form>
       </TabPanel>
       <TabPanel value={value} index={7}>
+        <button class="button" onClick={handleCreateLoadMonitor}>
+                  Create Load Monitor
+                </button>
         <>
-          {bttsLocal.lenght !== 0 && (
+          {bttsOnlyLocal.lenght !== 0 && (
             <div>
-              <h4>BTTS</h4>
+              <h4>BTTS - {Object.keys(bttsSourcesCount).length}</h4>
               <ul className="sourcesAggs">
                 {Object.keys(bttsSources).length !== 0 &&
                   Object.keys(bttsSources).map((source, i) => {
@@ -3208,13 +4194,13 @@ function App() {
           )}
         </>
         <>
-          {overLocal.lenght !== 0 && (
+          {over25OnlyLocal.lenght !== 0 && (
             <div>
-              <h4>Over 25</h4>
+              <h4>Over 25 - {Object.keys(overSourcesCount).length}</h4>
               <ul className="sourcesAggs">
                 {Object.keys(o25Sources).length !== 0 &&
                   Object.keys(o25Sources).map((source, i) => {
-                    if (bttsSourcesCount[source]) {
+                    if (overSourcesCount[source]) {
                       return (
                         <li key={i} className="sourcesAggsElem">
                           <div
@@ -3222,7 +4208,7 @@ function App() {
                           >
                             {source}
                           </div>
-                          <div>{bttsSourcesCount[source]}</div>
+                          <div>{overSourcesCount[source]}</div>
                         </li>
                       );
                     } else {
@@ -3250,7 +4236,7 @@ function App() {
         <>
           {under25DataLocal.lenght !== 0 && (
             <div>
-              <h4>Under 25</h4>
+              <h4>Under 25 - {Object.keys(underSourcesCount).length}</h4>
               <ul className="sourcesAggs">
                 {Object.keys(u25Sources).length !== 0 &&
                   Object.keys(u25Sources).map((source, i) => {
@@ -3290,7 +4276,7 @@ function App() {
         <>
           {winDataLocal.lenght !== 0 && (
             <div>
-              <h4>Win Data</h4>
+              <h4>Win Data - {Object.keys(winSourcesCount).length}</h4>
               <ul className="sourcesAggs">
                 {Object.keys(winSources).length !== 0 &&
                   Object.keys(winSources).map((source, i) => {
@@ -3330,7 +4316,7 @@ function App() {
         <>
           {drawDataLocal.lenght !== 0 && (
             <div>
-              <h4>Draw Data</h4>
+              <h4>Draw Data - {Object.keys(drawSourcesCount).length}</h4>
               <ul className="sourcesAggs">
                 {Object.keys(drawSources).length !== 0 &&
                   Object.keys(drawSources).map((source, i) => {
@@ -3369,19 +4355,82 @@ function App() {
         </>
       </TabPanel>
       <TabPanel value={value} index={8}>
+        <button class="button" onClick={handleCreateProd}>
+                  Create Prod
+                </button>
         
-      <button
+                <button
                   className="button"
                   type="button"
                   onClick={() => handleLoadResProd()}
                 >
                   load res
                 </button>
+                <div className="prodButtonWrapper">
+                  <button class="button" onClick={handleSaveUnderProd}>
+                    Save Under Prod to Mongo
+                  </button>
+                  <button class="button" onClick={handleUpdUnderProd}>
+                    Upd Under Prod to Mongo
+                  </button>
+                  <button class="button" onClick={() => {getUnderProd(todayDate)}}>
+                    Get Under Prod from Mongo
+                  </button>
+                  
+                </div>
+                <div className="prodButtonWrapper">
+                  <button class="button" onClick={handleSaveBttsProd}>
+                    Save Btts Prod to Mongo
+                  </button>
+                  <button class="button" onClick={handleUpdBttsProd}>
+                    Upd Btts Prod to Mongo
+                  </button>
+                  <button class="button" onClick={() => {getBttsProd(todayDate)}}>
+                    Get Btts Prod from Mongo
+                  </button>
+                  
+                </div>
+                <div className="prodButtonWrapper">
+                  <button class="button" onClick={handleSaveOverProd}>
+                    Save Over Prod to Mongo
+                  </button>
+                  <button class="button" onClick={handleUpdOverProd}>
+                    Upd Over Prod to Mongo
+                  </button>
+                  <button class="button" onClick={() => {getOverProd(todayDate)}}>
+                    Get Over Prod from Mongo
+                  </button>
+                  
+                </div>
+                <div className="prodButtonWrapper">
+                  <button class="button" onClick={handleSaveWinProd}>
+                    Save Win Prod to Mongo
+                  </button>
+                  <button class="button" onClick={handleUpdWinProd}>
+                    Upd Win Prod to Mongo
+                  </button>
+                  <button class="button" onClick={() => {getWinProd(todayDate)}}>
+                    Get Win Prod from Mongo
+                  </button>
+                  
+                </div>
+                <div className="prodButtonWrapper">
+                  <button class="button" onClick={handleSaveDrawProd}>
+                    Save Draw Prod to Mongo
+                  </button>
+                  <button class="button" onClick={handleUpdDrawProd}>
+                    Upd Draw Prod to Mongo
+                  </button>
+                  <button class="button" onClick={() => {getDrawProd(todayDate)}}>
+                    Get Draw Prod from Mongo
+                  </button>
+                  
+                </div>
         <div>
           <p>btts</p>
           <>
           {productionBttsLocal.length !== 0 && (
-            <Table columns={columnsBttsProd} data={productionBttsLocal} />
+            <Table columns={columnsBttsProd} data={productionBttsLocal.filter(elem => elem.count > 2 || elem.numAcca !==0)} initialState={initialState}/>
           // <table className="table">
           //   <tbody>
           //     {/* <th className="cell width10">Res</th> */}
@@ -3435,44 +4484,45 @@ function App() {
           <p>over</p>
           <>
           {productionOverLocal.length !== 0 && (
-          <table className="table">
-            <tbody>
-              {/* <th className="cell width10">Res</th> */}
-              <th className="cell width20">Home Team</th>
-              {/* <th className="cell width20">Pred Team</th> */}
-              <th className="cell width20">Away Team</th>
-              <th className="cell width20">Count</th>
-              <th className="cell width20">Acc Count</th>
-              <th className="cell width20">Result</th>
-              <th className="cell width20">Over Yes</th>
-              {productionOverLocal
-                .sort((a, b) => {
-                  if (a.homeTeam < b.homeTeam) {
-                    return -1;
-                  }
-                  if (a.homeTeam > b.homeTeam) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((elem) => {
-                  return (
-                    <tr
-                      key={elem._id}
-                    >
-                      <td className="cell width20">{elem.homeTeam}</td>
-                      {/* <td className="cell width20">{elem.predTeam}</td> */}
-                      <td className="cell width20">{elem.awayTeam}</td>
-                      <td className="cell width20">{elem.count}</td>
-                      <td className="cell width20">{elem.numAcca}</td>
-                      <td className="cell width20">{elem.resultScore}</td>
-                      <td className="cell width20" style={{backgroundColor: elem.overYes ? 'yellow'
-                            : 'black' }}></td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+            <Table columns={columnsOverProd} data={productionOverLocal.filter(elem => elem.count > 2 || elem.numAcca !==0)} initialState={initialState}/>
+          // <table className="table">
+          //   <tbody>
+          //     {/* <th className="cell width10">Res</th> */}
+          //     <th className="cell width20">Home Team</th>
+          //     {/* <th className="cell width20">Pred Team</th> */}
+          //     <th className="cell width20">Away Team</th>
+          //     <th className="cell width20">Count</th>
+          //     <th className="cell width20">Acc Count</th>
+          //     <th className="cell width20">Result</th>
+          //     <th className="cell width20">Over Yes</th>
+          //     {productionOverLocal
+          //       .sort((a, b) => {
+          //         if (a.homeTeam < b.homeTeam) {
+          //           return -1;
+          //         }
+          //         if (a.homeTeam > b.homeTeam) {
+          //           return 1;
+          //         }
+          //         return 0;
+          //       })
+          //       .map((elem) => {
+          //         return (
+          //           <tr
+          //             key={elem._id}
+          //           >
+          //             <td className="cell width20">{elem.homeTeam}</td>
+          //             {/* <td className="cell width20">{elem.predTeam}</td> */}
+          //             <td className="cell width20">{elem.awayTeam}</td>
+          //             <td className="cell width20">{elem.count}</td>
+          //             <td className="cell width20">{elem.numAcca}</td>
+          //             <td className="cell width20">{elem.resultScore}</td>
+          //             <td className="cell width20" style={{backgroundColor: elem.overYes ? 'yellow'
+          //                   : 'black' }}></td>
+          //           </tr>
+          //         );
+          //       })}
+          //   </tbody>
+          // </table>
         )}
           </>
         </div>
@@ -3480,43 +4530,44 @@ function App() {
           <p>under</p>
           <>
           {productionUnderLocal.length !== 0 && (
-          <table className="table">
-            <tbody>
-              {/* <th className="cell width10">Res</th> */}
-              <th className="cell width20">Home Team</th>
-              {/* <th className="cell width20">Pred Team</th> */}
-              <th className="cell width20">Away Team</th>
-              <th className="cell width20">Count</th>
-              <th className="cell width20">Acc Count</th>
-              <th className="cell width20">Result</th>
-              <th className="cell width20">Under Yes</th>
-              {productionUnderLocal
-                .sort((a, b) => {
-                  if (a.homeTeam < b.homeTeam) {
-                    return -1;
-                  }
-                  if (a.homeTeam > b.homeTeam) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((elem) => {
-                  return (
-                    <tr
-                      key={elem._id}
-                    >
-                      <td className="cell width20">{elem.homeTeam}</td>
-                      {/* <td className="cell width20">{elem.predTeam}</td> */}
-                      <td className="cell width20">{elem.awayTeam}</td>
-                      <td className="cell width20">{elem.count}</td>
-                      <td className="cell width20">{elem.numAcca}</td>
-                      <td className="cell width20">{elem.resultScore}</td>
-                      <td className="cell width20" style={{backgroundColor: elem.underYes ? 'yellow': 'black' }}></td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+            <Table columns={columnsUnderProd} data={productionUnderLocal.filter(elem => elem.count > 2 || elem.numAcca !==0)} initialState={initialState}/>
+          // <table className="table">
+          //   <tbody>
+          //     {/* <th className="cell width10">Res</th> */}
+          //     <th className="cell width20">Home Team</th>
+          //     {/* <th className="cell width20">Pred Team</th> */}
+          //     <th className="cell width20">Away Team</th>
+          //     <th className="cell width20">Count</th>
+          //     <th className="cell width20">Acc Count</th>
+          //     <th className="cell width20">Result</th>
+          //     <th className="cell width20">Under Yes</th>
+          //     {productionUnderLocal
+          //       .sort((a, b) => {
+          //         if (a.homeTeam < b.homeTeam) {
+          //           return -1;
+          //         }
+          //         if (a.homeTeam > b.homeTeam) {
+          //           return 1;
+          //         }
+          //         return 0;
+          //       })
+          //       .map((elem) => {
+          //         return (
+          //           <tr
+          //             key={elem._id}
+          //           >
+          //             <td className="cell width20">{elem.homeTeam}</td>
+          //             {/* <td className="cell width20">{elem.predTeam}</td> */}
+          //             <td className="cell width20">{elem.awayTeam}</td>
+          //             <td className="cell width20">{elem.count}</td>
+          //             <td className="cell width20">{elem.numAcca}</td>
+          //             <td className="cell width20">{elem.resultScore}</td>
+          //             <td className="cell width20" style={{backgroundColor: elem.underYes ? 'yellow': 'black' }}></td>
+          //           </tr>
+          //         );
+          //       })}
+          //   </tbody>
+          // </table>
         )}
           </>
         </div>
@@ -3524,50 +4575,51 @@ function App() {
           <p>win</p>
           <>
           {productionWinLocal.length !== 0 && (
-          <table className="table">
-            <tbody>
-              {/* <th className="cell width10">Res</th> */}
-              <th className="cell width15">Home Team</th>
-              {/* <th className="cell width15">Pred Team</th> */}
-              <th className="cell width15">Away Team</th>
-              <th className="cell width15">Prediction</th>
-              <th className="cell width10">Count</th>
-              <th className="cell width10">Acc Count</th>
-              <th className="cell width10">Win Count</th>
-              <th className="cell width10">Xwin Count</th>
-              <th className="cell width10">Result</th>
-              <th className="cell width10">WinYes</th>
-              {productionWinLocal
-                .sort((a, b) => {
-                  if (a.homeTeam < b.homeTeam) {
-                    return -1;
-                  }
-                  if (a.homeTeam > b.homeTeam) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((elem) => {
-                  return (
-                    <tr
-                      key={elem._id}
-                    >
-                      <td className="cell width15">{elem.homeTeam}</td>
-                      {/* <td className="cell width15">{elem.predTeam}</td> */}
-                      <td className="cell width15">{elem.awayTeam}</td>
-                      <td className="cell width15">{elem.prediction}</td>
-                      <td className="cell width10">{elem.count}</td>
-                      <td className="cell width10">{elem.numAcca}</td>
-                      <td className="cell width10">{elem.winNum}</td>
-                      <td className="cell width10">{elem.xwinNum}</td>
-                      <td className="cell width10">{elem.resultScore}</td>
-                      <td className="cell width10" style={{backgroundColor: elem.winYes ? 'yellow'
-                            : 'black' }}></td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+            <Table columns={columnsWinProd} data={productionWinLocal.filter(elem => elem.count > 2 || elem.numAcca !==0)} initialState={initialState}/>
+          // <table className="table">
+          //   <tbody>
+          //     {/* <th className="cell width10">Res</th> */}
+          //     <th className="cell width15">Home Team</th>
+          //     {/* <th className="cell width15">Pred Team</th> */}
+          //     <th className="cell width15">Away Team</th>
+          //     <th className="cell width15">Prediction</th>
+          //     <th className="cell width10">Count</th>
+          //     <th className="cell width10">Acc Count</th>
+          //     <th className="cell width10">Win Count</th>
+          //     <th className="cell width10">Xwin Count</th>
+          //     <th className="cell width10">Result</th>
+          //     <th className="cell width10">WinYes</th>
+          //     {productionWinLocal
+          //       .sort((a, b) => {
+          //         if (a.homeTeam < b.homeTeam) {
+          //           return -1;
+          //         }
+          //         if (a.homeTeam > b.homeTeam) {
+          //           return 1;
+          //         }
+          //         return 0;
+          //       })
+          //       .map((elem) => {
+          //         return (
+          //           <tr
+          //             key={elem._id}
+          //           >
+          //             <td className="cell width15">{elem.homeTeam}</td>
+          //             {/* <td className="cell width15">{elem.predTeam}</td> */}
+          //             <td className="cell width15">{elem.awayTeam}</td>
+          //             <td className="cell width15">{elem.prediction}</td>
+          //             <td className="cell width10">{elem.count}</td>
+          //             <td className="cell width10">{elem.numAcca}</td>
+          //             <td className="cell width10">{elem.winNum}</td>
+          //             <td className="cell width10">{elem.xwinNum}</td>
+          //             <td className="cell width10">{elem.resultScore}</td>
+          //             <td className="cell width10" style={{backgroundColor: elem.winYes ? 'yellow'
+          //                   : 'black' }}></td>
+          //           </tr>
+          //         );
+          //       })}
+          //   </tbody>
+          // </table>
         )}
           </>
         </div>
@@ -3575,52 +4627,93 @@ function App() {
           <p>draw</p>
           <>
           {productionDrawLocal.length !== 0 && (
-          <table className="table">
-            <tbody>
-              {/* <th className="cell width10">Res</th> */}
-              <th className="cell width15">Home Team</th>
-              {/* <th className="cell width15">Pred Team</th> */}
-              <th className="cell width15">Away Team</th>
-              <th className="cell width10">Count</th>
-              <th className="cell width10">Acc Count</th>
-              <th className="cell width10">Result</th>
-              <th className="cell width10">Draw Yes</th>
-              {productionDrawLocal
-                .sort((a, b) => {
-                  if (a.homeTeam < b.homeTeam) {
-                    return -1;
-                  }
-                  if (a.homeTeam > b.homeTeam) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((elem) => {
-                  return (
-                    <tr
-                      key={elem._id}
-                    >
-                      <td className="cell width15">{elem.homeTeam}</td>
-                      {/* <td className="cell width15">{elem.predTeam}</td> */}
-                      <td className="cell width15">{elem.awayTeam}</td>
-                      <td className="cell width10">{elem.count}</td>
-                      <td className="cell width10">{elem.numAcca}</td>
-                      <td className="cell width10">{elem.resultScore}</td>
-                      <td className="cell width10" style={{backgroundColor: elem.drawYes ? 'yellow'
-                            : 'black' }}>{elem.drawYes}</td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+            <Table columns={columnsDrawProd} data={productionDrawLocal.filter(elem => elem.count > 2 || elem.numAcca !==0)} initialState={initialState}/>
+          // <table className="table">
+          //   <tbody>
+          //     {/* <th className="cell width10">Res</th> */}
+          //     <th className="cell width15">Home Team</th>
+          //     {/* <th className="cell width15">Pred Team</th> */}
+          //     <th className="cell width15">Away Team</th>
+          //     <th className="cell width10">Count</th>
+          //     <th className="cell width10">Acc Count</th>
+          //     <th className="cell width10">Result</th>
+          //     <th className="cell width10">Draw Yes</th>
+          //     {productionDrawLocal
+          //       .sort((a, b) => {
+          //         if (a.homeTeam < b.homeTeam) {
+          //           return -1;
+          //         }
+          //         if (a.homeTeam > b.homeTeam) {
+          //           return 1;
+          //         }
+          //         return 0;
+          //       })
+          //       .map((elem) => {
+          //         return (
+          //           <tr
+          //             key={elem._id}
+          //           >
+          //             <td className="cell width15">{elem.homeTeam}</td>
+          //             {/* <td className="cell width15">{elem.predTeam}</td> */}
+          //             <td className="cell width15">{elem.awayTeam}</td>
+          //             <td className="cell width10">{elem.count}</td>
+          //             <td className="cell width10">{elem.numAcca}</td>
+          //             <td className="cell width10">{elem.resultScore}</td>
+          //             <td className="cell width10" style={{backgroundColor: elem.drawYes ? 'yellow'
+          //                   : 'black' }}>{elem.drawYes}</td>
+          //           </tr>
+          //         );
+          //       })}
+          //   </tbody>
+          // </table>
         )}
           </>
         </div>
       </TabPanel>
-      {/* <TabPanel value={value} index={3}>
-        Item Four
+      <TabPanel value={value} index={9}>
+        <div className="prodButtonWrapper">
+        {productionDrawLocal.length !==0 && <button class="button" onClick={handleCreateTodayStatArrDraw}>
+        Create Today Stat Draw
+        </button>}
+        {todayStatDraw.length !==0 && <button class="button" onClick={handleSaveDailyStatToMongoDraw}>
+        Save Today Stat Draw to Mongo
+        </button>}
+        </div>
+        <div className="prodButtonWrapper">
+        {productionWinLocal.length !==0 && <button class="button" onClick={handleCreateTodayStatArrWin}>
+        Create Today Stat Win
+        </button>}
+        {todayStatWin.length !==0 && <button class="button" onClick={handleSaveDailyStatToMongoWin}>
+        Save Today Stat Win to Mongo
+        </button>}
+        </div>
+        <div className="prodButtonWrapper">
+        {productionOverLocal.length !==0 && <button class="button" onClick={handleSaveTodayTotalOver}>
+        Create Today Stat Over
+        </button>}
+        {todayStatOver.length !==0 && <button class="button" onClick={handleSaveDailyStatToMongoOver}>
+        Save Today Stat Over to Mongo
+        </button>}
+        </div>
+        <div className="prodButtonWrapper">
+        {productionBttsLocal.length !==0 && <button class="button" onClick={handleSaveTodayTotalBtts}>
+        Create Today Stat Btts
+        </button>}
+        {todayStatBtts.length !==0 && <button class="button" onClick={handleSaveDailyStatToMongoBtts}>
+        Save Today Stat Btts to Mongo
+        </button>}
+        </div>
+        <div className="prodButtonWrapper">
+        {productionUnderLocal.length !==0 && <button class="button" onClick={handleSaveTodayTotalUnder}>
+          Create Today Stat Under
+        </button>}
+        {todayStatUnder.length !==0 && <button class="button" onClick={handleSaveDailyStatToMongoUnder}>
+        Save Today Stat Under to Mongo
+        </button>}
+        </div>
+
       </TabPanel>
-      <TabPanel value={value} index={4}>
+      {/* <TabPanel value={value} index={4}>
         Item Five
       </TabPanel>
       <TabPanel value={value} index={5}>

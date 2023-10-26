@@ -70,7 +70,7 @@ input[type='checkbox'] { display: none; }
     transition: max-height .25s ease-in-out; 
   } 
   .toggle:checked + .lbl-toggle + .collapsible-content { 
-    max-height: 4000px; 
+    max-height: fit-content; 
   } 
   .toggle:checked+.lbl-toggle { 
     border-bottom-right-radius: 0; border-bottom-left-radius: 0; 
@@ -132,9 +132,19 @@ input[type='checkbox'] { display: none; }
 .date {
   margin: 1rem 0;
 }
+.prodButtonWrapper {
+  margin-top: 10px;
+}
+.prodButtonWrapper button{
+  margin-right: 10px;
+}
 table, .table {
   width: 100%;
   border-collapse: collapse;
+}
+th {
+  font-size: 12px;
+  border: 1px solid gray;
 }
 td, .cell {
   border: 1px solid gray;

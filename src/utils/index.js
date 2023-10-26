@@ -27,8 +27,279 @@ export function sortData(data) {
   });
 }
 
-export function getHomeTeamName(name) {
+export function getSourcesProd(name) {
+  switch (name) {
+    case 'banker_draw':
+    case 'banker_win':
+    case 'banker_o25':
+    case 'banker_btts':
+      return 'bnk|';
+    case 'wininbets_draw':
+    case 'wininbets_win':
+    case 'wininbets_o25':
+    case 'wininbets_btts':
+      return 'wnb|';
+    case 'soccerpunt_draw':
+    case 'soccerpunt_win':
+    case 'soccerpunt_o25':
+    case 'soccerpunt_btts':
+      return 'spt_acc|';
+    case 'trustpredict_draw':
+    case 'trustpredict_win':
+    case 'trustpredict_o25':
+    case 'trustpredict_btts':
+      return 'tst|';
+    case 'fbp_draw':
+    case 'fbp_win':
+    case 'fbp_u25':
+    case 'fbp_o25':
+      return 'fbp|';
+    case 'soccertipz_draw':
+    case 'soccertipz_win':
+    case 'soccertipz_u25':
+      return 'stz|';
+    case 'hello_draw':
+    case 'hello_win':
+    case 'hello_o25':
+    case 'hello_btts':
+      return 'hel|';
+    case 'mybets_draw':
+    case 'mybets_u25':
+      return 'mbt|';
+    case 'mybets_win':
+      return 'mbt_acc|';
+    case 'passion_draw':
+    case 'passion_win':
+    case 'passion_u25':
+    case 'passion_o25':
+    case 'passion_btts':
+      return 'pas|';
+    case 'victorspredict_draw':
+    case 'victorspredict_win':
+    case 'victorspredict_o25':
+    case 'victorspredict_btts':
+      return 'vic|';
+    case 'kingspredict_win':
+    case 'kingspredict_o25':
+    case 'kingspredict_btts':
+      return 'kng|';
+    case 'kingspredict_acc_o25':
+      return 'kng_acc|';
+    case 'r2bet_draw':
+    case 'r2bet_win':
+    case 'r2bet_u25':
+    case 'r2bet_o25':
+    case 'r2bet_btts':
+      return 'rbt|';
+    case 'venas_draw':
+    case 'venas_win':
+    case 'venas_u25':
+    case 'venas_o25':
+    case 'venas_btts':
+      return 'vns|';
+    case 'prot_draw':
+    case 'prot_win':
+    case 'prot_o25':
+    case 'prot_btts':
+      return 'prt_acc|';
+    case 'betimate_draw':
+    case 'betimate_win':
+    case 'betimate_u25':
+    case 'betimate_o25':
+    case 'betimate_btts':
+      return 'bmt|';
+    case 'vitibet_draw':
+    case 'vitibet_win':
+    case 'vitibet_u25':
+    case 'vitibet_o25':
+    case 'vitibet_btts':
+      return 'vbt|';
+    case 'fbpai_draw':
+    case 'fbpai_u25':
+      return 'fbi|';
+    case 'footsuper_draw':
+    case 'footsuper_win':
+    case 'footsuper_u25':
+    case 'footsuper_o25':
+    case 'footsuper_btts':
+      return 'fsr|';
+    case 'mines_draw':
+    case 'mines_win':
+    case 'mines_u25':
+      return 'mns|';
+    case 'bettingtips_draw':
+    case 'bettingtips_win':
+    case 'bettingtips_u25':
+    case 'bettingtips_o25':
+    case 'bettingtips_btts':
+      return 'bgt|';
+    case 'predutd_win':
+    case 'predutd_u25':
+    case 'predutd_o25':
+    case 'predutd_btts':
+      return 'pdt|';
+    case 'kcpredict_win':
+    case 'kcpredict_o25':
+    case 'kcpredict_btts':
+      return 'kcp|';
+    case 'o25tip_win':
+    case 'o25tip':
+      return 'otp_acc|';
+    case 'footy_win':
+    case 'footy_o25':
+    case 'footy_btts':
+      return 'fot|';
+    case 'wincomparator_win':
+    case 'wincomparator_u25':
+    case 'wincomparator_o25':
+    case 'wincomparator_btts':
+      return 'cmp_acc|';
+    case 'betclan_win':
+    case 'betclan_u25':
+    case 'betclan_o25':
+    case 'betclan_btts':
+      return 'cln_acc|';
+    case 'bettingtips_acc_win':
+    case 'bettingtips_acc_o25':
+    case 'bettingtips_acc_btts':
+      return 'bgt_acc|';
+    case 'morph_o25':
+      return 'mrp_acc|';
+    case 'mighty_btts':
+      return 'mgt|';
+    case 'accum_o25':
+    case 'accum_btts':
+      return 'cum_acc|';
+    case 'betshoot_o25':
+    case 'betshoot_btts':
+      return 'bsh_acc|';
+    case 'mines_acc_o25':
+      return 'mns_acc|';
+    case 'wdw_o25':
+      return 'wdw_acc|';
+    case 'bigfree_win':
+    case 'bigfree_u25':
+    case 'bigfree_o25':
+    case 'bigfree_btts':
+      return 'bfr|';
+    case 'fbp365_win':
+    case 'fbp365_o25':
+    case 'fbp365_btts':
+      return 'fbt_acc|';
+    case 'fst_o25':
+    case 'fst_btts':
+      return 'fst_acc|';
+    case 'goalsnow_u25':
+    case 'goalnow_o25':
+    case 'goalsnow_btts':
+      return 'gln_acc|';
+    case 'betprotips_u25':
+    case 'betprotips_o25':
+    case 'betprotips_btts':
+      return 'bpt_acc|';
+    case 'footsuper_acc_o25':
+    case 'footsuper_acc_btts':
+      return 'fsr_acc|';
+    case 'fbp_acc_u25':
+    case 'fbp_acc_o25':
+    case 'fbp_acc_btts':
+      return 'fbp_acc|';
+    default:
+      return name;
+  }
+}
+export function getSourcesProdInverse(name) {
+  switch (name) {
+    case 'bnk|':
+      return 'banker';
+    case 'wnb|':
+      return 'wininbets';
+    case 'spt_acc|':
+      return 'soccerpunt_acc';
+    case 'tst|':
+      return 'trustpredict';
+    case 'fbp|':
+      return 'fbp';
+    case 'stz|':
+      return 'soccertipz';
+    case 'hel|':
+      return 'hello';
+    case 'mbt|':
+      return 'mybets';
+    case 'mbt_acc|':
+      return 'mybets_acc';
+    case 'pas|':
+      return 'passion';
+    case 'vic|':
+      return 'victorspredict';
+    case 'kng|':
+      return 'kingspredict';
+    case 'kng_acc|':
+      return 'kingspredict_acc';
+    case 'rbt|':
+      return 'r2bet';
+    case 'vns|':
+      return 'venas';
+    case 'prt_acc|':
+      return 'prot';
+    case 'bmt|':
+      return 'betimate';
+    case 'vbt|':
+      return 'vitibet';
+    case 'fbi|':
+      return 'fbpai';
+    case 'fsr|':
+      return 'footsuper';
+    case 'mns|':
+      return 'mines';
+    case 'bgt|':
+      return 'bettingtips';
+    case 'pdt|':
+      return 'predutd';
+    case 'kcp|':
+      return 'kcpredict';
+    case 'otp_acc|':
+      return 'o25tip';
+    case 'fot|':
+      return 'footy';
+    case 'cmp_acc|':
+      return 'wincomparator';
+    case 'cln_acc|':
+      return 'betclan';
+    case 'bgt_acc|':
+      return 'bettingtips_acc';
+    case 'mrp_acc|':
+      return 'morph_o25';
+    case 'mgt|':
+      return 'mighty';
+    case 'cum_acc|':
+      return 'accum';
+    case 'bsh_acc|':
+      return 'betshoot';
+    case 'mns_acc|':
+      return 'mines_acc_o25';
+    case 'wdw_acc|':
+      return 'wdw_o25';
+    case 'bfr|':
+      return 'bigfree';
+    case 'fbt_acc|':
+      return 'fbp365';
+    case 'fst_acc|':
+      return 'fst';
+    case 'gln_acc|':
+      return 'goalnow';
+    case 'bpt_acc|':
+      return 'betprotips';
+    case 'fsr_acc|':
+      return 'footsuper_acc';
+    case 'fbp_acc|':
+      return 'fbp_acc';
+    default:
+      return name;
+  }
+}
 
+export function getHomeTeamName(name) {
   switch (name) {
     case 'Maidenhead United':
       return 'Maidenhead Utd';
@@ -42,20 +313,110 @@ export function getHomeTeamName(name) {
       return 'Zakakiou';
     case 'IK Brage':
       return 'Brage';
+    case 'St Patrick\'s':
+      return 'St Patricks';
     case 'JK Tabasalu':
       return 'Tabasalu';
     case 'Apoel Nicosia':
       return 'APOEL';
     case ' Ajaccio':
       return 'Ajaccio';
+    case 'AFylde':
+      return 'Fylde';
+    case 'TSteinbach':
+      return 'Steinbach Haiger';
+    case 'Wycombe Wanderers':
+      return 'Wycombe';
+    case 'Racing Club de Lens':
+      return 'Lens';
+    case 'A Fylde':
+      return 'Fylde';
+    case 'Örebro SK':
+      return 'Orebro';
+    case 'Orebro SK':
+      return 'Orebro';
+    case 'Wycombe Wanderer':
+      return 'Wycombe';
+    case 'Wrexham AFC':
+      return 'Wrexham';
+    case 'Wigan Athletic':
+      return 'Wigan';
+    case 'Utsikten':
+      return 'Utsiktens BK';
+    case 'Northampton Town':
+      return 'Northampton';
+    case 'Milton Keynes Do':
+      return 'MK Dons';
+    case 'Milton Keynes':
+      return 'MK Dons';
+    case 'Milton Keynes Dons':
+      return 'MK Dons';
+    case 'Manchester Unite':
+      return 'Manchester United';
+    case 'Huddersfield Tow':
+      return 'Huddersfield';
+    case 'Huddersfield Town':
+      return 'Huddersfield';
+    case 'Galatasaray SK':
+      return 'Galatasaray';
+    case 'Forest Green Rov':
+      return 'Forest Green';
+    case 'Forest Green Rovers':
+      return 'Forest Green';
+    case 'Farnborough Town':
+      return 'Farnborough';
+    case 'Elgin City':
+      return 'Elgin';
+    case 'Brescia Calcio':
+      return 'Brescia';
+    case 'Benfica Lisboa':
+      return 'Benfica';
+    case 'Athlone':
+      return 'Athlone Town';
     case ' Utrecht (jun.)':
       return 'Utrecht Reserves';
     case ' Utrecht Reserves':
       return 'Utrecht Reserves';
     case 'Odense BK':
       return 'Odense';
+    case 'OB Odense':
+      return 'Odense';
+    case 'PReserves':
+      return 'PSV Reserves';
+    case 'Jong AZ Alkmaar':
+      return 'AZ Reserves';
     case 'Malmö':
       return 'Malmo';
+    case 'Atletico Bucaramanga':
+      return 'Bucaramanga';
+    case 'Radnicki Kragujevac':
+      return 'Radnicki 1923';
+    case 'Arsenal de Sarandí':
+      return 'Arsenal de Sarandi';
+    case 'Arsenal Sarandi':
+      return 'Arsenal de Sarandi';
+    case 'Atlético Tucumán':
+      return 'Atletico Tucuman';
+    case 'Belgrano Cordoba':
+      return 'Belgrano';
+    case 'NK Tolmin':
+      return 'Tolmin';
+    case 'T1899 Hoffenheim II':
+      return 'Hoffenheim II';
+    case 'Paris Saint-Germain':
+      return 'PSG';
+    case 'Celtic Glasgow':
+      return 'Celtic';
+    case 'Stade Lavallois':
+      return 'Laval';
+    case 'Udinese Calcio':
+      return 'Udinese';
+    case 'I Varnamo':
+      return 'Varnamo';
+    case 'SPalermo':
+      return 'Palermo';
+    case 'Al Ittihad (Sau)':
+      return 'Al Ittihad Jeddah';
     case 'Kobenhavn':
       return 'Copenhagen';
     case 'IF Elfsborg':
@@ -148,6 +509,42 @@ export function getHomeTeamName(name) {
       return 'Roda';
     case 'Osnabrück':
       return 'Osnabruck';
+    case 'ASepsi':
+      return 'Sepsi';
+    case 'Sepsi Sfântu Gheorghe':
+      return 'Sepsi';
+    case 'Sepsi Sf. Gheorghe':
+      return 'Sepsi';
+    case 'Paphos':
+      return 'Pafos';
+    case 'Värnamo':
+      return 'Varnamo';
+    case 'Pogoń Siedlce':
+      return 'Pogon Siedlce';
+    case 'Palermo SSD':
+      return 'Palermo';
+    case 'OB':
+      return 'Odense';
+    case 'Odense Boldklub':
+      return 'Odense';
+    case 'Jonkoping':
+      return 'Jonkopings Sodra';
+    case 'Jong AZ':
+      return 'AZ Reserves';
+    case 'Helmond':
+      return 'Helmond Sport';
+    case 'Karagumruk':
+      return 'Fatih Karagumruk';
+    case 'Fatih Karagümrükspor':
+      return 'Fatih Karagumruk';
+    case 'Fatih Karagumruk SK':
+      return 'Fatih Karagumruk';
+    case 'Fatih Karagümrük':
+      return 'Fatih Karagumruk';
+    case 'Chelmsford':
+      return 'Chelmsford City';
+    case 'ACF Fiorentina':
+      return 'Fiorentina';
     case 'VfL Osnabruck':
       return 'Osnabruck';
     case 'VfB Stuttgart':
@@ -164,14 +561,30 @@ export function getHomeTeamName(name) {
       return 'Aalborg';
     case 'HB Køge':
       return 'Koge';
+    case 'Avaí':
+      return 'Avai';
+    case 'HB Koge':
+      return 'Koge';
     case 'Koge BK':
       return 'Koge';
+    case 'Lyngby BK':
+      return 'Lyngby';
+    case 'Real Valladolid':
+      return 'Valladolid';
+    case 'Grasshopper Zurich':
+      return 'Grasshoppers';
+    case 'Heart of Midlothian':
+      return 'Hearts';
     case 'AaB Aalborg BK':
+      return 'Aalborg';
+    case 'AaB Aalborg':
       return 'Aalborg';
     case 'Belshina Bobruisk':
       return 'Belshina';
     case 'BATE':
       return 'BATE Borisov';
+    case 'Doxa':
+      return 'Doxa Katokopias';
     case 'Bate Borisov':
       return 'BATE Borisov';
     case 'UC Dublin':
@@ -188,12 +601,14 @@ export function getHomeTeamName(name) {
       return 'Bayern Munich';
     case 'Bayern München':
       return 'Bayern Munich';
-    case 'ADO \'20':
+    case "ADO '20":
       return 'ADO 20 Heemskerk';
     case 'ACV':
       return 'ACV Assen';
     case 'Lask Linz':
       return 'LASK Linz';
+    case 'Bhayangkara Surabaya United':
+      return 'Bhayangkara';
     case 'LASK':
       return 'LASK Linz';
     case 'Olympiacos Piraeus':
@@ -206,10 +621,16 @@ export function getHomeTeamName(name) {
       return 'Bodo/Glimt';
     case 'FC Lugano':
       return 'Lugano';
+    case 'Bayer 04 Leverkusen':
+      return 'Bayer Leverkusen';
     case 'Betis Sevilla':
       return 'Betis';
     case 'Molde FK':
       return 'Molde';
+    case 'Cucuta Deportivo':
+      return 'Cucuta';
+    case 'Al Khaleej Saihat':
+      return 'Al Khaleej';
     case 'Trnava':
       return 'Spartak Trnava';
     case 'Aston Villa Birmingham':
@@ -220,16 +641,180 @@ export function getHomeTeamName(name) {
       return 'Olimpija Ljubljana';
     case 'Nordsjaeland':
       return 'Nordsjaelland';
+    case 'Brighton & Hove Albion':
+      return 'Brighton';
+    case 'GenoaC':
+      return 'Genoa';
+    case 'Standard Liège':
+      return 'Standard Liege';
+    case 'Standard de Liege':
+      return 'Standard Liege';
+    case 'Schalke 04':
+      return 'Schalke';
+    case 'Ranheim Fotball':
+      return 'Ranheim';
+    case 'Panathinaikos Athens':
+      return 'Panathinaikos';
+    case 'Lierse Kempenzonen':
+      return 'Lierse';
+    case 'Lierse K':
+      return 'Lierse';
+    case 'Lausanne Sports':
+      return 'Lausanne Sport';
+    case 'Ingolstadt 04':
+      return 'Ingolstadt';
+    case 'IVarnamo':
+      return 'Varnamo';
+    case 'Baerum SK':
+      return 'Baerum';
+    case 'IL Sandviken':
+      return 'Sandviken';
+    case 'Flekkeroy IL':
+      return 'Flekkeroy';
+    case 'St Mirren':
+      return 'St. Mirren';
+    case 'Helsingør':
+      return 'Helsingor';
+    case 'Burton':
+      return 'Burton Albion';
+    case 'Bærum':
+      return 'Baerum';
+    case 'Kieler SV Holstein':
+      return 'Holstein Kiel';
+    case 'Flekkerøy':
+      return 'Flekkeroy';
+    case 'Baerum Sportsklubb':
+      return 'Baerum';
+    case 'IVärnamo':
+      return 'Varnamo';
+    case 'Villarreal II':
+      return 'Villarreal B';
+    case 'Guangzhou Evergrande':
+      return 'Guangzhou';
+    case 'IK Start Kristiansand':
+      return 'IK Start';
+    case 'Start':
+      return 'IK Start';
+    case 'BYoung Boys Bern':
+      return 'Young Boys';
+    case 'Wolves':
+      return 'Wolverhampton';
+    case 'Vejle BK':
+      return 'Vejle';
+    case 'Valerenga Oslo':
+      return 'Valerenga';
+    case 'IF Brommapojkarna':
+      return 'Brommapojkarna';
+    case 'Hradec Králové':
+      return 'Hradec Kralove';
+    case 'Granada 74':
+      return 'Granada';
+    case 'Ferencvárosi TC Budapest':
+      return 'Ferencvaros';
+    case 'Deportes Copiapó':
+      return 'Deportes Copiapo';
+    case 'Brighton Hove Albion':
+      return 'Brighton';
+    case 'Fylkir Reykjavik':
+      return 'Fylkir';
+    case 'GD Estoril Praia':
+      return 'Estoril';
+    case 'Exeter':
+      return 'Exeter City';
+    case 'Everton Liverpool':
+      return 'Everton';
+    case 'Cercle Brugge KSV':
+      return 'Cercle Brugge';
+    case 'Bradford':
+      return 'Bradford City';
+    case 'Bohemians 1905':
+      return 'Bohemians';
+    case 'Bohemians 1905 Praha':
+      return 'Bohemians';
+    case 'Barrow AFC':
+      return 'Barrow';
+    case 'Cardiff':
+      return 'Cardiff City';
+    case 'Ath Bilbao':
+      return 'Athletic Bilbao';
+    case 'Aberystwyth':
+      return 'Aberystwyth Town';
+    case 'Racing Club Strasbourg':
+      return 'Strasbourg';
+    case 'Radnički Niš':
+      return 'Radnicki NIS';
+    case 'PSV Eindhoven (jun.)':
+      return 'PSV Reserves';
+    case 'Lommel SK':
+      return 'Lommel';
+    case 'Linfield Belfast':
+      return 'Linfield';
+    case 'Fortuna Düsseldorf':
+      return 'Fortuna Dusseldorf';
+    case 'Dijon Football Cote d´Or':
+      return 'Dijon';
+    case 'Puskás AFC':
+      return 'Puskas Academy';
+    case 'R. Charleroi':
+      return 'Charleroi';
+    case 'AWimbledon':
+      return 'Wimbledon';
+    case 'REspanyol':
+      return 'Espanyol';
+    case 'VVV Venlo':
+      return 'VVV';
+    case 'Borussia M.gladbach':
+      return 'Borussia Monchengladbach';
+    case 'Borussia M\'gladbach':
+      return 'Borussia Monchengladbach';
+    case 'Athletic Club Bilbao':
+      return 'Athletic Bilbao';
+    case 'Al Ittihad':
+      return 'Al Ittihad Jeddah';
+    case 'Ajax Amsterdam (jun.)':
+      return 'Ajax Reserves';
     case 'Royal Antwerp':
       return 'Antwerp';
     case 'Real Oviedo':
       return 'Oviedo';
+    case 'Qizilqum Zarafshon':
+      return 'Qizilqum';
     case 'R. Oviedo':
       return 'Oviedo';
     case 'Ceilândia':
       return 'Ceilandia';
+    case 'AD Guanacasteca':
+      return 'Guanacasteca';
+    case 'Korea Republic':
+      return 'South Korea';
+    case 'Slough':
+      return 'Slough Town';
+    case 'Chesham':
+      return 'Chesham United';
+    case 'Rep of Ireland':
+      return 'Ireland';
+    case 'Rep. Of Ireland':
+      return 'Ireland';
     case 'Breiðablik':
       return 'Breidablik';
+    case 'US Pontedera':
+      return 'Pontedera';
+    case 'Quilmes AC':
+      return 'Quilmes';
+    case 'SD Eibar':
+      return 'Eibar';
+    case 'Londrina EC':
+      return 'Londrina';
+    case 'Wexford Youths':
+      return 'Wexford';
+    case 'Bosnia Herzegovina':
+      return 'Bosnia';
+    case 'Bosnia-Herzegovina':
+      return 'Bosnia';
+    case 'Bosnia and Herzegovina':
+      return 'Bosnia';
+    case 'Bosnia & Herzegovina':
+      return 'Bosnia';
     case 'Bačka Topola':
       return 'Backa Topola';
     case 'TBacka Topola':
@@ -268,9 +853,121 @@ export function getHomeTeamName(name) {
       return 'Manchester United';
     case 'NK Domzale':
       return 'Domzale';
+    case 'Colón':
+      return 'Colon';
+    case 'NBreda':
+      return 'Breda';
+    case 'Coritiba FBC':
+      return 'Coritiba';
     case 'Domžale':
       return 'Domzale';
+    case 'AZ Alkmaar (jun.)':
+      return 'AZ Reserves';
+    case 'Wisła Kraków':
+      return 'Wisła Krakow';
+    case 'Waterford United':
+      return 'Waterford';
+    case 'Vysočina Jihlava':
+      return 'Jihlava';
+    case 'Utrecht (jun.)':
+      return 'Utrecht Reserves';
+    case 'Union St. Gilloise':
+      return 'Union SG';
+    case 'Union Saint Gilloise':
+      return 'Union SG';
+    case 'Tranmere Rovers':
+      return 'Tranmere';
+    case 'SønderjyskE':
+      return 'Sonderjyske';
+    case 'SonderjyskE':
+      return 'Sonderjyske';
+    case 'Glentoran Belfast':
+      return 'Glentoran';
+    case 'Dunfermline Athletic':
+      return 'Dunfermline';
+    case 'Chelsea London':
+      return 'Chelsea';
+    case 'Celta Vigo':
+      return 'Celta';
+    case 'Bodø / Glimt':
+      return 'Bodo/Glimt';
+    case 'Barry Town United':
+      return 'Barry Town';
+    case 'Barry':
+      return 'Barry Town';
+    case 'SonderjyskE Haderslev':
+      return 'Sonderjyske';
+    case 'Shanghai SIPG':
+      return 'Shanghai Port';
+    case 'Shamrock Rovers':
+      return 'Shamrock';
+    case 'Newport':
+      return 'Newport County';
+    case 'NAC Breda':
+      return 'Breda';
+    case 'G.A. Eagles':
+      return 'Go Ahead Eagles';
+    case 'GO Ahead Eagles':
+      return 'Go Ahead Eagles';
+    case 'Le Havre AC':
+      return 'Le Havre';
+    case 'Bohemians Dublin':
+      return 'Bohemians';
+    case 'Al Gharafa SC':
+      return 'Al Gharafa';
+    case 'Al Fateh SC':
+      return 'Al Fateh';
+    case 'Gimna \' Plata':
+      return 'Gimnasia La Plata';
+    case 'Perak FA':
+      return 'Perak';
+    case 'LD Alajuelense':
+      return 'Alajuelense';
+    case 'Racing Club':
+      return 'Racing Montevideo';
+    case 'Racing Club Montevideo':
+      return 'Racing Montevideo';
+    case 'Racing Club de Montevideo':
+      return 'Racing Montevideo';
+    case 'KF Partizani Tirana':
+      return 'Partizani Tirana';
+    case 'Partizani':
+      return 'Partizani Tirana';
+    case 'Goiás Esporte Clube':
+      return 'Goias';
+    case 'Gimnasia L.P.':
+      return 'Gimnasia La Plata';
+    case 'Gimnasia LP':
+      return 'Gimnasia La Plata';
+    case 'Cruzeiro Esporte Clube':
+      return 'Cruzeiro';
+    case 'Colon Santa Fe':
+      return 'Colon';
+    case 'Bahia Salvador':
+      return 'Bahia';
+    case 'Atletico GO':
+      return 'Atletico Goianiense';
+    case 'Atlético Goianiense':
+      return 'Atletico Goianiense';
+    case 'América Mineiro':
+      return 'America Mineiro';
+    case 'America MG':
+      return 'America Mineiro';
+    case 'Al-Nasr Dubai SC':
+      return 'Al-Nasr';
+    case 'ACSM Politehnica Iasi':
+      return 'Poli Iasi';
+    case 'CSM Politehnica Iasi':
+      return 'Poli Iasi';
+    case 'CSM Iaşi':
+      return 'Poli Iasi';
+    case 'CSMS Iaşi':
+      return 'Poli Iasi';
+    case 'SSV Jeddeloh':
+      return 'Jeddeloh';
     case 'Zrinjski':
+      return 'Zrinjski Mostar';
+    case 'HŠK Zrinjski Mostar':
       return 'Zrinjski Mostar';
     case 'Bayer':
       return 'Bayer Leverkusen';
@@ -320,11 +1017,23 @@ export function getHomeTeamName(name) {
       return 'Accrington Stanley';
     case 'Sheffield United':
       return 'Sheff Utd';
+    case 'Sheff Utd':
+      return 'Sheff Utd';
+    case 'West Bromwich':
+      return 'West Brom';
+    case 'OGC Nice':
+      return 'Nice';
+    case 'Red Bull Salzbourg':
+      return 'Salzbourg';
+    case 'T1899 Hoffenheim':
+      return 'Hoffenheim';
+    case 'VfL Wolfsbourg':
+      return 'Wolfsbourg';
     case 'Hertha BSC II':
       return 'Hertha Berlin II';
     case 'Sheffield Utd':
       return 'Sheff Utd';
-    case 'Tala\'ea El Gaish':
+    case "Tala'ea El Gaish":
       return 'Tala Al Jaish';
     case 'ADO Den Haag':
       return 'Den Haag';
@@ -360,6 +1069,12 @@ export function getHomeTeamName(name) {
       return 'Angers';
     case 'FC Koln':
       return 'Cologne';
+    case 'Koln':
+      return 'Cologne';
+    case 'Dender EH':
+      return 'Dender';
+    case 'Aalesunds':
+      return 'Aalesund';
     case 'Köln':
       return 'Cologne';
     case 'Degerfors IF':
@@ -402,6 +1117,64 @@ export function getHomeTeamName(name) {
       return 'Luton';
     case 'Luton Town':
       return 'Luton';
+    case 'B36 Torshavn':
+      return 'B36';
+    case 'Grasshoper':
+      return 'Grasshopers';
+    case 'Pumas UNAM':
+      return 'Unam Pumas';
+    case 'Rosenborg BK Trondheim':
+      return 'Rosenborg';
+    case 'Persita Tangerang':
+      return 'Persita';
+    case 'Persija Jakarta':
+      return 'Persija';
+    case 'Paide Linnameeskond':
+      return 'Paide';
+    case 'PAOK Thessaloniki':
+      return 'PAOK';
+    case 'PAOK Salonika':
+      return 'PAOK';
+    case 'P.A.O.K.':
+      return 'PAOK';
+    case 'Kőln':
+      return 'Cologne';
+    case 'Oud-Heverlee Leuven':
+      return 'Leuven';
+    case 'OH Leuven':
+      return 'Leuven';
+    case 'Karlsruher SC':
+      return 'Karlsruher';
+    case 'Heidenheim 1846':
+      return 'Heidenheim';
+    case 'Grasshoppers Zürich':
+      return 'Grasshopers';
+    case 'FCV Dender EH':
+      return 'Dender';
+    case 'Fenerbahçe SK':
+      return 'Fenerbahçe';
+    case 'Excelsior Rotterdam':
+      return 'Excelsior';
+    case 'Aalesund FK':
+      return 'Aalesund';
+    case 'Arda':
+      return 'Arda Kardzhali';
+    case 'Albacete Balompie':
+      return 'Albacete';
+    case 'Paris Saint Germain':
+      return 'PSG';
+    case 'Paris SG':
+      return 'PSG';
+    case 'ESTTroyes':
+      return 'Troyes';
+    case 'Preston North End':
+      return 'Preston';
+    case 'Preston North En':
+      return 'Preston';
+    case 'Ternana Calcio':
+      return 'Ternana';
+    case 'Glasgow Rangers':
+      return 'Rangers';
     case 'Al-Duhail SC':
       return 'Al Duhail';
     case 'Al-Rayyan':
@@ -484,6 +1257,18 @@ export function getHomeTeamName(name) {
       return 'Al Rayyan';
     case 'Maringá':
       return 'Maringa';
+    case 'Havant & W':
+      return 'Havant';
+    case 'Havant & Waterlooville':
+      return 'Havant';
+    case 'Havant Waterloov':
+      return 'Havant';
+    case 'Feyenoord Rotterdam':
+      return 'Feyenoord';
+    case 'BYoung Boys':
+      return 'Young Boys';
+    case 'Atletico PR':
+      return 'Athletico Paranaense';
     case 'Stoke':
       return 'Stoke City';
     case 'Stockport County':
@@ -500,8 +1285,18 @@ export function getHomeTeamName(name) {
       return 'Cheltenham';
     case 'Carlisle United':
       return 'Carlisle';
+    case 'Sassuolo Calcio':
+      return 'Sassuolo';
     case 'Doncaster Rovers':
       return 'Doncaster';
+    case 'SV Darmstadt 98':
+      return 'Darmstadt';
+    case 'SK Brann Bergen':
+      return 'SK Brann';
+    case 'Peterborough United':
+      return 'Peterborough';
+    case 'Man City':
+      return 'Manchester City';
     case 'Helsingborgs':
       return 'Helsingborg';
     case 'GAIS Göteborg':
@@ -688,7 +1483,7 @@ export function getHomeTeamName(name) {
       return 'Borussia Monchengladbach';
     case 'Gladbach':
       return 'Borussia Monchengladbach';
-    case 'Queen\'s Park':
+    case "Queen's Park":
       return 'Queens Park';
     case 'Anorthosis Famagusta':
       return 'Anorthosis';
@@ -704,6 +1499,32 @@ export function getHomeTeamName(name) {
       return 'Sudeva Moonlight';
     case 'Marília':
       return 'Marilia';
+    case 'Stevenage Borough':
+      return 'Stevenage';
+    case 'St. Gallen':
+      return 'St Gallen';
+    case 'Queen´s Park':
+      return 'Queens Park';
+    case 'Queens Park Rangers':
+      return 'QPR';
+    case 'Odd BK':
+      return 'Odd';
+    case 'Västeras SK':
+      return 'Vasteras';
+    case 'Västerås SK FK':
+      return 'Vasteras';
+    case 'Werder':
+      return 'Werder Bremen';
+    case 'Odd Grenland BK':
+      return 'Odd';
+    case 'Neman Grodno':
+      return 'Neman';
+    case 'Kecskemeti TE':
+      return 'Kecskemeti';
+    case 'Kecskeméti TE':
+      return 'Kecskemeti';
+    case 'Istanbul BFK':
+      return 'Istanbul Basaksehir';
     case 'Municipal Grecia':
       return 'AD Grecia';
     case 'Nova Mutum EC':

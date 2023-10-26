@@ -11,6 +11,7 @@ export const loadUnder = async () => {
   // const res = await fetch(`https://tipster-server.vercel.app/under/load`);
   const res = await fetch(`http://localhost:8000/under/load`);
   const text = await res.text();
+  console.log('text222',text);
   return text;
 };
 export const loadUnderWithVpn = async () => {

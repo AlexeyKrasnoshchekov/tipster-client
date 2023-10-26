@@ -72,6 +72,12 @@ const State = (props) => {
       bettingtips_draw: {
         exist: false
       },
+      victorspredict_draw: {
+        exist: false
+      },
+      soccerpunt_draw: {
+        exist: false
+      },
     },
     winSources: {
       passion_win: {
@@ -140,6 +146,24 @@ const State = (props) => {
       bettingtips_win: {
         exist: false
       },
+      bigfree_win: {
+        exist: false
+      },
+      fbp365_win: {
+        exist: false
+      },
+      kingspredict_win: {
+        exist: false
+      },
+      victorspredict_win: {
+        exist: false
+      },
+      soccerpunt_win: {
+        exist: false
+      },
+      wininbets_win: {
+        exist: false
+      },
     },
     u25Sources: {
       goalsnow_u25: {
@@ -194,6 +218,15 @@ const State = (props) => {
         exist: false
       },
       fbp_u25: {
+        exist: false
+      },
+      bigfree_u25: {
+        exist: false
+      },
+      soccerpunt_u25: {
+        exist: false
+      },
+      wininbets_u25: {
         exist: false
       },
     },
@@ -261,9 +294,9 @@ const State = (props) => {
       mines_acc_o25: {
         exist: false
       },
-      betshoot_o25: {
-        exist: false
-      },
+      // betshoot_o25: {
+      //   exist: false
+      // },
       betclan_o25: {
         exist: false
       },
@@ -282,9 +315,36 @@ const State = (props) => {
       fbp_o25: {
         exist: false
       },
+      fst_o25: {
+        exist: false
+      },
+      fbp365_o25: {
+        exist: false
+      },
+      bigfree_o25: {
+        exist: false
+      },
+      kingspredict_o25: {
+        exist: false
+      },
+      kingspredict_acc_o25: {
+        exist: false
+      },
+      victorspredict_o25: {
+        exist: false
+      },
+      soccerpunt_o25: {
+        exist: false
+      },
+      wininbets_o25: {
+        exist: false
+      },
     },
     bttsSources: {
       fbp_acc_btts: {
+        exist: false
+      },
+      kingspredict_btts: {
         exist: false
       },
       footsuper_btts: {
@@ -329,9 +389,9 @@ const State = (props) => {
       prot_btts: {
         exist: false
       },
-      betshoot_btts: {
-        exist: false
-      },
+      // betshoot_btts: {
+      //   exist: false
+      // },
       betclan_btts: {
         exist: false
       },
@@ -351,6 +411,27 @@ const State = (props) => {
         exist: false
       },
       bettingtips_btts: {
+        exist: false
+      },
+      fbp365_btts: {
+        exist: false
+      },
+      bigfree_btts: {
+        exist: false
+      },
+      fst_btts: {
+        exist: false
+      },
+      hello_btts: {
+        exist: false
+      },
+      victorspredict_btts: {
+        exist: false
+      },
+      soccerpunt_btts: {
+        exist: false
+      },
+      wininbets_btts: {
         exist: false
       },
       

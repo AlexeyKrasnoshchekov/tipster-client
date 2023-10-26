@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortBy, useTable } from 'react-table';
 
-export default function Table({ columns, data }) {
+export default function Table({ columns, data, initialState }) {
   // Use the useTable Hook to send the columns and data to build the table
   const {
     getTableProps, // table props from react-table
@@ -9,7 +9,7 @@ export default function Table({ columns, data }) {
     headerGroups, // headerGroups, if your table has groupings
     rows, // rows for the table based on the data passed
     prepareRow, // Prepare the row (this function needs to be called for each row before getting the row props)
-  } = useTable({ columns, data }, useSortBy);
+  } = useTable({ columns, data, initialState }, useSortBy);
 
   const combinedCellProps = (defaultCellProps, { cell }) => {
     return [
@@ -26,7 +26,19 @@ export default function Table({ columns, data }) {
 
     // color BttsYes data
     if (header === 'Btts Yes') {
-      styleObject.backgroundColor = value ? 'yellow' : 'black';
+      styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
+    }
+    if (header === 'Over Yes') {
+      styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
+    }
+    if (header === 'Draw Yes') {
+      styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
+    }
+    if (header === 'Under Yes') {
+      styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
+    }
+    if (header === 'Win Yes') {
+      styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
     }
     if (header === 'Home Team') {
       styleObject.textAlign = 'left';
@@ -57,6 +69,9 @@ export default function Table({ columns, data }) {
                 }
               >
                 {column.render('Header')}
+                <span style={{marginLeft: '5px'}}>
+                  {column.isSorted ? (column.isSortedDesc ? 1 : 2) : ""}
+                </span>
               </th>
             ))}
           </tr>
