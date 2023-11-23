@@ -57,9 +57,6 @@ const State = (props) => {
       betimate_draw: {
         exist: false
       },
-      vitibet_draw: {
-        exist: false
-      },
       fbpai_draw: {
         exist: false
       },
@@ -76,6 +73,36 @@ const State = (props) => {
         exist: false
       },
       soccerpunt_draw: {
+        exist: false
+      },
+      fbp2_draw: {
+        exist: false
+      },
+      betwizad_draw: {
+        exist: false
+      },
+      predictz_draw: {
+        exist: false
+      },
+      btfstats_draw: {
+        exist: false
+      },
+      fcpredicts_draw: {
+        exist: false
+      },
+      frog_draw: {
+        exist: false
+      },
+      betgen_draw: {
+        exist: false
+      },
+      eagle_draw: {
+        exist: false
+      },
+      bettips1x2_draw: {
+        exist: false
+      },
+      vitibet_draw: {
         exist: false
       },
     },
@@ -102,9 +129,6 @@ const State = (props) => {
         exist: false
       },
       o25tip_win: {
-        exist: false
-      },
-      vitibet_win: {
         exist: false
       },
       footy_win: {
@@ -164,6 +188,36 @@ const State = (props) => {
       wininbets_win: {
         exist: false
       },
+      fbp2_win: {
+        exist: false
+      },
+      betwizad_win: {
+        exist: false
+      },
+      predictz_win: {
+        exist: false
+      },
+      btfstats_win: {
+        exist: false
+      },
+      fcpredicts_win: {
+        exist: false
+      },
+      frog_win: {
+        exist: false
+      },
+      betgen_win: {
+        exist: false
+      },
+      eagle_win: {
+        exist: false
+      },
+      bettips1x2_win: {
+        exist: false
+      },
+      vitibet_win: {
+        exist: false
+      },
     },
     u25Sources: {
       goalsnow_u25: {
@@ -178,9 +232,7 @@ const State = (props) => {
       soccertipz_u25: {
         exist: false
       },
-      vitibet_u25: {
-        exist: false
-      },
+      
       r2bet_u25: {
         exist: false
       },
@@ -229,6 +281,36 @@ const State = (props) => {
       wininbets_u25: {
         exist: false
       },
+      fbp2_u25: {
+        exist: false
+      },
+      betwizad_u25: {
+        exist: false
+      },
+      predictz_u25: {
+        exist: false
+      },
+      btfstats_u25: {
+        exist: false
+      },
+      fcpredicts_u25: {
+        exist: false
+      },
+      frog_u25: {
+        exist: false
+      },
+      betgen_u25: {
+        exist: false
+      },
+      eagle_u25: {
+        exist: false
+      },
+      bettips1x2_u25: {
+        exist: false
+      },
+      vitibet_u25: {
+        exist: false
+      },
     },
     o25Sources: {
       goalnow_o25: {
@@ -259,9 +341,6 @@ const State = (props) => {
         exist: false
       },
       banker_o25: {
-        exist: false
-      },
-      vitibet_o25: {
         exist: false
       },
       venas_o25: {
@@ -339,6 +418,36 @@ const State = (props) => {
       wininbets_o25: {
         exist: false
       },
+      fbp2_o25: {
+        exist: false
+      },
+      betwizad_o25: {
+        exist: false
+      },
+      predictz_o25: {
+        exist: false
+      },
+      btfstats_o25: {
+        exist: false
+      },
+      fcpredicts_o25: {
+        exist: false
+      },
+      frog_o25: {
+        exist: false
+      },
+      betgen_o25: {
+        exist: false
+      },
+      eagle_o25: {
+        exist: false
+      },
+      bettips1x2_o25: {
+        exist: false
+      },
+      vitibet_o25: {
+        exist: false
+      },
     },
     bttsSources: {
       fbp_acc_btts: {
@@ -404,9 +513,6 @@ const State = (props) => {
       betprotips_btts: {
         exist: false
       },
-      vitibet_btts: {
-        exist: false
-      },
       passion_btts: {
         exist: false
       },
@@ -434,258 +540,38 @@ const State = (props) => {
       wininbets_btts: {
         exist: false
       },
-      
-    },
-    zeroCounter: {
-      // o25tip_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      o25tip_high: {
-        total: 0,
-        matches: [],
+      fbp2_btts: {
+        exist: false
       },
-      bettingtips_o25: {
-        total: 0,
-        matches: [],
+      betwizad_btts: {
+        exist: false
       },
-      wincomparator_o25: {
-        total: 0,
-        matches: [],
+      predictz_btts: {
+        exist: false
       },
-      accum_btts: {
-        total: 0,
-        matches: [],
+      btfstats_btts: {
+        exist: false
       },
-      fst_btts: {
-        total: 0,
-        matches: [],
+      fcpredicts_btts: {
+        exist: false
       },
-      r2bet_o25: {
-        total: 0,
-        matches: [],
+      frog_btts: {
+        exist: false
       },
-      hello_o25: {
-        total: 0,
-        matches: [],
+      betgen_btts: {
+        exist: false
       },
-      fbp_o25: {
-        total: 0,
-        matches: [],
+      eagle_btts: {
+        exist: false
       },
-      fst_o25: {
-        total: 0,
-        matches: [],
+      bettips1x2_btts: {
+        exist: false
       },
-      footsuper_o25: {
-        total: 0,
-        matches: [],
-      },
-      footsuper_btts: {
-        total: 0,
-        matches: [],
-      },
-      bettingtips_btts: {
-        total: 0,
-        matches: [],
-      },
-      prot_o25: {
-        total: 0,
-        matches: [],
-      },
-      prot_btts: {
-        total: 0,
-        matches: [],
-      },
-      r2bet_btts: {
-        total: 0,
-        matches: [],
-      },
-      goalnow_o25: {
-        total: 0,
-        matches: [],
-      },
-      accum_o25: {
-        total: 0,
-        matches: [],
-      },
-      wincomparator_btts: {
-        total: 0,
-        matches: [],
-      },
-      // wincomparator_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // mybets_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // venasbet_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      venas_o25: {
-        total: 0,
-        matches: [],
-      },
-      venas_btts: {
-        total: 0,
-        matches: [],
-      },
-      // prot_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // footy_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // betgenuine_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // vitibet_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      vitibet_o25: {
-        total: 0,
-        matches: [],
-      },
-      // r2bet_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // mines_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // passion_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // fbp_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // footsuper_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // hello_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      // bettingtips_win: {
-      //   total: 0,
-      //   matches: [],
-      // },
-      morph_o25: {
-        total: 0,
-        matches: [],
-      },
-      kcpredict_o25: {
-        total: 0,
-        matches: [],
-      },
-      kcpredict_btts: {
-        total: 0,
-        matches: [],
-      },
-      trustpredict_btts: {
-        total: 0,
-        matches: [],
-      },
-      trustpredict_o25: {
-        total: 0,
-        matches: [],
-      },
-      fbp_btts: {
-        total: 0,
-        matches: [],
-      },
-      fbp_acc_btts: {
-        total: 0,
-        matches: [],
-      },
-      fbp_acc_o25: {
-        total: 0,
-        matches: [],
-      },
-      mines_acc_o25: {
-        total: 0,
-        matches: [],
-      },
-      mines_o25: {
-        total: 0,
-        matches: [],
-      },
-      mines_btts: {
-        total: 0,
-        matches: [],
-      },
-      banker_btts: {
-        total: 0,
-        matches: [],
-      },
-      banker_o25: {
-        total: 0,
-        matches: [],
-      },
-      fbpai_btts: {
-        total: 0,
-        matches: [],
-      },
-      fbpai_o25: {
-        total: 0,
-        matches: [],
-      },
-      predutd_o25: {
-        total: 0,
-        matches: [],
-      },
-      footsuper_acc_btts: {
-        total: 0,
-        matches: [],
-      },
-      footsuper_acc_o25: {
-        total: 0,
-        matches: [],
-      },
-      soccertipz_o25: {
-        total: 0,
-        matches: [],
-      },
-      soccertipz_btts: {
-        total: 0,
-        matches: [],
-      },
-      wdw_acc_btts: {
-        total: 0,
-        matches: [],
-      },
-      wdw_acc_o25: {
-        total: 0,
-        matches: [],
-      },
-      mighty_btts: {
-        total: 0,
-        matches: [],
-      },
-      passion_o25: {
-        total: 0,
-        matches: [],
-      },
-      betimate: {
-        total: 0,
-        matches: [],
-      },
-      betprotips: {
-        total: 0,
-        matches: [],
+      vitibet_btts: {
+        exist: false
       },
     },
+   
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

@@ -1,8 +1,9 @@
 import React from 'react';
 import { useSortBy, useTable } from 'react-table';
 
-export default function Table({ columns, data, initialState }) {
+export default function Table({ columns, data, initialState, bttsEv, overEv, winEv,to15O25,to15W,to15B }) {
   // Use the useTable Hook to send the columns and data to build the table
+  console.log('winEv',winEv);
   const {
     getTableProps, // table props from react-table
     getTableBodyProps, // table body props from react-table
@@ -28,6 +29,91 @@ export default function Table({ columns, data, initialState }) {
     if (header === 'Btts Yes') {
       styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
     }
+
+    //btts prod table clours
+    if (bttsEv && header === 'Btts Yes Count') {
+      styleObject.backgroundColor = value > bttsEv.totalBttsYesEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Count1') {
+      styleObject.backgroundColor = value > bttsEv.totalCountEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Acc Count1') {
+      styleObject.backgroundColor = value > bttsEv.totalAccaCountEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Ev Btts Yes Eff') {
+      styleObject.backgroundColor = value > bttsEv.totalBttsYesEffEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Ev Over05 Eff1') {
+      styleObject.backgroundColor = value > bttsEv.totalOver05EffEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Ev Over15 Eff1') {
+      styleObject.backgroundColor = value > bttsEv.totalOver15EffEv ? 'lightgreen' : 'pink';
+    }
+    if (bttsEv && header === 'Under 25 Num1') {
+      styleObject.backgroundColor = value < bttsEv.totalUnder25Count ? 'lightgreen' : 'pink';
+    }
+
+    //over prod table clours
+    if (overEv && header === 'Count2') {
+      styleObject.backgroundColor = value > overEv.totalCountEv ? 'lightgreen' : 'pink';
+    }
+    if (overEv && header === 'Acc Count2') {
+      styleObject.backgroundColor = value > overEv.totalAccaCountEv ? 'lightgreen' : 'pink';
+    }
+    if (overEv && header === 'Ev Over05 Eff2') {
+      styleObject.backgroundColor = value > overEv.totalOver05EffEv ? 'lightgreen' : 'pink';
+    }
+    if (overEv && header === 'Ev Over15 Eff2') {
+      styleObject.backgroundColor = value > overEv.totalOver15EffEv ? 'lightgreen' : 'pink';
+    }
+    if (overEv && header === 'Ev Over25 Eff2') {
+      styleObject.backgroundColor = value > overEv.totalOver25EffEv ? 'lightgreen' : 'pink';
+    }
+    if (overEv && header === 'Under 25 Num2') {
+      styleObject.backgroundColor = value < overEv.totalUnder25Count ? 'lightgreen' : 'pink';
+    }
+
+    //win prod table clours
+    if (winEv && header === 'Count3') {
+      styleObject.backgroundColor = value > winEv.totalCountEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Acc Count3') {
+      styleObject.backgroundColor = value > winEv.totalAccaCountEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Win Count') {
+      styleObject.backgroundColor = value > winEv.totalWinCountEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Ev WinYes Eff') {
+      styleObject.backgroundColor = value > winEv.totalWinYesEffEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Ev Over05 Eff3') {
+      styleObject.backgroundColor = value > winEv.totalOver05EffEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Ev Over15 Eff3') {
+      styleObject.backgroundColor = value > winEv.totalOver15EffEv ? 'lightgreen' : 'pink';
+    }
+    if (winEv && header === 'Under 25 Num3') {
+      styleObject.backgroundColor = value < winEv.totalUnder25Count ? 'lightgreen' : 'pink';
+    }
+
+    //full table prod table clours
+    if (header === 'CountU') {
+      styleObject.backgroundColor = value >= 2 ? 'yellow' : 'transparent';
+    }
+    if (header === 'Top O15O') {
+      styleObject.backgroundColor = value >= 1 ? 'lightgreen' : 'transparent';
+    }
+    if (header === 'Top O15B') {
+      styleObject.backgroundColor = value >= 1 ? 'lightgreen' : 'transparent';
+    }
+    if (header === 'Top O15W') {
+      styleObject.backgroundColor = value >= 1 ? 'lightgreen' : 'transparent';
+    }
+    // if (header === 'CountU') {
+    //   styleObject.backgroundColor = value >= 2 ? 'yellow' : 'transparent';
+    // }
+
+
     if (header === 'Over Yes') {
       styleObject.backgroundColor = value === 'true' ? 'yellow' : 'black';
     }
